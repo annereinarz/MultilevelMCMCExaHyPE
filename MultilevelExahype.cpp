@@ -49,7 +49,7 @@ public:
   virtual ~MySamplingProblem(){
   }
 
-  virtual double LogDensity(unsigned int const t, std::shared_ptr<SamplingState> const& state, AbstractSamplingProblem::SampleType type) override {
+  virtual double LogDensity(std::shared_ptr<SamplingState> const& state) override {
     comm->Barrier();
     lastState = state;
 
@@ -182,12 +182,12 @@ public:
      dist(dist)
   {}
 
-  std::shared_ptr<SamplingState> Sample(std::shared_ptr<SamplingState> currentState) override {
+  std::shared_ptr<SamplingState> Sample(std::shared_ptr<SamplingState> const& currentState) override {
     return std::make_shared<SamplingState>(dist->Sample());
   }
 
-  double LogDensity(std::shared_ptr<SamplingState> currState,
-                    std::shared_ptr<SamplingState> propState) override {
+  double LogDensity(std::shared_ptr<SamplingState> const& currState,
+                    std::shared_ptr<SamplingState> const& propState) override {
     return 0.0;
   }
 
