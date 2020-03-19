@@ -6,8 +6,7 @@ In ExaHyPE it is important to use the muq branch and to switch Peano to the muq 
 
 In order to create the build directory type:
 
-cmake -DCMAKE_PREFIX_PATH=$HOME/exahype/muq2/build -DEXAHYPE_PATH=/home/hd/hd_hd/hd_bl386/exahype/ExaHyPE-Engine/Applica
-tionExamples/SWE/SWE_MC_ADERDG ..
+cmake -DCMAKE_PREFIX_PATH=$HOME/[Path-to-MUQ]/build -DEXAHYPE_PATH=[Path-to-ExaHyPE]e/ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADERDG ..
 
 
 The application can then be compiled using 
