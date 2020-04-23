@@ -267,7 +267,6 @@ int main(int argc, char** argv){
     MIMCMC mimcmc (pt, componentFactory);
     mimcmc.Run();
 
-    std::cout << "ML mean Param: " << mimcmc.MeanParameter().transpose() << std::endl;
     std::cout << "ML mean QOI: " << mimcmc.MeanQOI().transpose() << std::endl;
   }
 
