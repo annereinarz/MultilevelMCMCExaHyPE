@@ -1,20 +1,21 @@
 # MultilevelMCMCExaHyPE
 
-This is the MUQ interface for ExaHyPE. To run a MCMC chain you need to install both ExaHyPE and MUQ first. 
+This is the MUQ interface for ExaHyPE. To run a MCMC chain you need to install both ExaHyPE and MUQ first.
 
 In ExaHyPE it is important to use the reinarz/muq branch and to switch Peano to the muq branch as well.
 Also, in muq, currently use the linus/mimcmc branch until that is merged in master.
+
+Navigate to
+
+  ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADERDG
+
 You must then run the toolkit
 
   ../../../Toolkit/toolkit.sh ../SWE_MC_ADERDG.exahype2
 
-build by calling
+Now set the exports noted in export.sh to set options. Finally, call
 
-  make -j4
-
-and then set the exports noted in export.sh to set options. Finally, call
-
-  make link_muq
+  make -j4 link_muq
 
 to build the muq integration.
 
@@ -27,7 +28,7 @@ In order to create the build directory type:
   cmake -DCMAKE_PREFIX_PATH=$HOME/[Path-to-MUQ]/build -DEXAHYPE_PATH=[Path-to-ExaHyPE]/ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADERDG ..
 
 
-The application can then be compiled using 
+The application can then be compiled using
 
   make
 
