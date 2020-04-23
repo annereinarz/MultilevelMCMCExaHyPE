@@ -57,7 +57,6 @@ public:
     //std::ofstream file("Input/parameters.csv");
     //file << state->state[0].format(CSVFormat);
     //file.close();
-    unsigned int idx= index->GetValue(0); //TODO check if passing index works
 
     //Write parameters into ExaHyPE readable format
     std::vector<double> param(state->state[0].size());
@@ -81,7 +80,8 @@ public:
         return -24;
 
     //run forward model
-    int level = 4;
+    int level = index->GetValue(0);
+    std::cout << "run_exahype with level " << level << std::endl;
     auto output = muq::run_exahype(param,level);
 
     comm->Barrier();
@@ -136,7 +136,7 @@ public:
 
   virtual std::shared_ptr<MultiIndex> FinestIndex() override {
     auto index = std::make_shared<MultiIndex>(1);
-    index->SetValue(0, 0);
+    index->SetValue(0, 1);
     return index;
   }
 
@@ -146,7 +146,7 @@ public:
     pt::ptree ptProposal;
     ptProposal.put("BlockIndex",0);
     int subsampling = 5;
-    ptProposal.put("subsampling", subsampling);
+    ptProposal.put("Subsampling", subsampling);
     return std::make_shared<SubsamplingMIProposal>(ptProposal, coarseProblem, coarseChain);
   }
 
@@ -252,12 +252,17 @@ int main(int argc, char** argv){
   if (comm->GetRank() == 0) {
   std::cout << std::endl << "*************** single chain reference" << std::endl << std::endl;
 
-  SLMCMC slmcmc (pt, componentFactory);
-  slmcmc.Run();
+  //SLMCMC slmcmc (pt, componentFactory);
+  //slmcmc.Run();
 
+  MIMCMC mimcmc (pt, componentFactory);
+  mimcmc.Run();
 
-  std::cout << "mean Param: " << slmcmc.MeanParameter().transpose() << std::endl;
-  std::cout << "mean QOI: " << slmcmc.MeanQOI().transpose() << std::endl;
+  //std::cout << "SL mean Param: " << slmcmc.MeanParameter().transpose() << std::endl;
+  //std::cout << "SL mean QOI: " << slmcmc.MeanQOI().transpose() << std::endl;
+
+  //std::cout << "ML mean Param: " << mimcmc.MeanParameter().transpose() << std::endl;
+  std::cout << "ML mean QOI: " << mimcmc.MeanQOI().transpose() << std::endl;
 
   //std::cout << "variance QOI: " << slmcmc.VarianceQOI().transpose() << std::endl;
 
