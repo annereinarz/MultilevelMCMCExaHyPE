@@ -6,3 +6,4 @@ info tarch -1 black
 info peano -1 black
 info peano::utils::UserInterface -1 black
 info exahype -1 black
+info mpibalancing -1 black
