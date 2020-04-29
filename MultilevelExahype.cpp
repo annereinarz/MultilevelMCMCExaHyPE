@@ -29,6 +29,7 @@ using namespace muq::SamplingAlgorithms;
 using namespace muq::Utilities;
 
 #include <fstream>
+#include <stdio.h>
 
 //TODO: read in
 const int NUM_PARAM = 2;
@@ -252,19 +253,23 @@ int main(int argc, char** argv){
   if (comm->GetRank() == 0) {
   std::cout << std::endl << "*************** single chain reference" << std::endl << std::endl;
 
-  //SLMCMC slmcmc (pt, componentFactory);
-  //slmcmc.Run();
+  {
+    SLMCMC slmcmc (pt, componentFactory);
+    std::shared_ptr<SampleCollection> samples = slmcmc.Run();
 
-  MIMCMC mimcmc (pt, componentFactory);
-  mimcmc.Run();
+    std::cout << "SL mean Param: " << slmcmc.MeanParameter().transpose() << std::endl;
+    std::cout << "SL mean QOI: " << slmcmc.MeanQOI().transpose() << std::endl;
 
-  //std::cout << "SL mean Param: " << slmcmc.MeanParameter().transpose() << std::endl;
-  //std::cout << "SL mean QOI: " << slmcmc.MeanQOI().transpose() << std::endl;
+    remove("slmcmc.hdf5");
+    samples->WriteToFile("slmcmc.hdf5");
+  }
+  {
+    MIMCMC mimcmc (pt, componentFactory);
+    mimcmc.Run();
 
-  //std::cout << "ML mean Param: " << mimcmc.MeanParameter().transpose() << std::endl;
-  std::cout << "ML mean QOI: " << mimcmc.MeanQOI().transpose() << std::endl;
+    std::cout << "ML mean QOI: " << mimcmc.MeanQOI().transpose() << std::endl;
+  }
 
-  //std::cout << "variance QOI: " << slmcmc.VarianceQOI().transpose() << std::endl;
 
   //Write mean to file
   /*std::ofstream file("Input/parameters.csv");
