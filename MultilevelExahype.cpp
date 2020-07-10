@@ -238,6 +238,8 @@ int main(int argc, char** argv){
   pt.put("GreedyTargetVariance", 0.05); //ignore// estimator variance to be achieved by greedy algorithm
   pt.put("verbosity", 1); // show some output
   pt.put("BurnIn", 10);
+  pt.put("NumSamples_0", 1e2);
+  pt.put("NumSamples_1", 5e1);
 
   /*std::cout << std::endl << "*************** greedy multillevel chain" << std::endl << std::endl;
 
