@@ -18,6 +18,8 @@ string(STRIP ${EXAHYPE_LINKS} EXAHYPE_LINKS)
 
 configure_file(exahype.log-filter exahype.log-filter COPYONLY)
 
+add_custom_target(link_target ALL COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/Output ${CMAKE_CURRENT_BINARY_DIR}/Output)
+
 add_executable(MultilevelExahype MultilevelExahype.cpp)
 target_link_libraries(MultilevelExahype ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
 target_include_directories(MultilevelExahype PRIVATE ${EXAHYPE_PATH})
