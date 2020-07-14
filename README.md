@@ -35,4 +35,4 @@ The application can then be compiled using
 
 Running your binary requires the .exahype2 file to be passed:
 
-  mpirun -np 4 [Path-to-ExaHyPE]/ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADC_ADERDG.exahype2
+  mpirun -np 4 ./MultilevelExaHyPE [Path-to-ExaHyPE]/ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADC_ADERDG.exahype2
