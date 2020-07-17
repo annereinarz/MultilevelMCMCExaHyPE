@@ -20,7 +20,12 @@ configure_file(exahype.log-filter exahype.log-filter COPYONLY)
 
 add_custom_target(link_target ALL COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/Output ${CMAKE_CURRENT_BINARY_DIR}/Output)
 
-add_executable(MultilevelExahype MultilevelExahype.cpp)
-target_link_libraries(MultilevelExahype ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
-target_include_directories(MultilevelExahype PRIVATE ${EXAHYPE_PATH})
-set_target_properties(MultilevelExahype PROPERTIES LINK_FLAGS ${EXAHYPE_LINKS})
+add_executable(SLMCMC SLMCMC.cpp)
+target_link_libraries(SLMCMC ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
+target_include_directories(SLMCMC PRIVATE ${EXAHYPE_PATH})
+set_target_properties(SLMCMC PROPERTIES LINK_FLAGS ${EXAHYPE_LINKS})
+
+add_executable(MLMCMC MLMCMC.cpp)
+target_link_libraries(MLMCMC ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
+target_include_directories(MLMCMC PRIVATE ${EXAHYPE_PATH})
+set_target_properties(MLMCMC PROPERTIES LINK_FLAGS ${EXAHYPE_LINKS})
