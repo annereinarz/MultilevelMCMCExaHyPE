@@ -42,13 +42,6 @@ int main(int argc, char** argv){
   pt.put("NumSamples_0", 1e2);
   pt.put("NumSamples_1", 5e1);
 
-  /*std::cout << std::endl << "*************** greedy multillevel chain" << std::endl << std::endl;
-
-  GreedyMLMCMC greedymlmcmc (pt, componentFactory);
-  greedymlmcmc.Run();
-  std::cout << "mean QOI: " << greedymlmcmc.MeanQOI().transpose() << std::endl;
-  greedymlmcmc.Draw(false);*/
-
   auto comm = std::make_shared<parcer::Communicator>();
   localFactory->SetComm(comm);
   auto componentFactory = std::make_shared<ParallelMIComponentFactory>(comm, comm, localFactory);
@@ -58,21 +51,12 @@ int main(int argc, char** argv){
     {
       MIMCMC mimcmc (pt, componentFactory);
       mimcmc.Run();
+      mimcmc.WriteToFile("MLMCMC.h5");
       std::cout << "ML mean QOI: " << mimcmc.MeanQOI().transpose() << std::endl;
     }
 
-
-  //Write mean to file
-  /*std::ofstream file("Input/parameters.csv");
-  file << (slmcmc.MeanQOI()).format(CSVFormat);
-  file.close();*/
   }
   componentFactory->finalize();
-
-  //plot mean
-  //std::vector<double> param = {slmcmc.MeanQOI()(0), slmcmc.MeanQOI()(1)};
-  //muq::run_exahype(param);
-  //calculateLikelihood();
 
 }
 
