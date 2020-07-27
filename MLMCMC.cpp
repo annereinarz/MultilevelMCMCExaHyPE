@@ -51,7 +51,8 @@ int main(int argc, char** argv){
     {
       MIMCMC mimcmc (pt, componentFactory);
       mimcmc.Run();
-      mimcmc.WriteToFile("MLMCMC.h5");
+      remove("mlmcmc.hdf5");
+      mimcmc.WriteToFile("mlmcmc.hdf5");
       std::cout << "ML mean QOI: " << mimcmc.MeanQOI().transpose() << std::endl;
     }
 

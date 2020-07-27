@@ -89,7 +89,8 @@ int main(int argc, char** argv){
   }
 
   parallelMIMCMC.Finalize();
-  parallelMIMCMC.WriteToFile("FullParallelMLMCMC.h5");
+  remove("FullParallelMLMCMC.hdf5");
+  parallelMIMCMC.WriteToFile("FullParallelMLMCMC.hdf5");
 
 
 }
