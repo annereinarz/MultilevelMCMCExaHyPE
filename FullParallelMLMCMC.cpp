@@ -89,7 +89,12 @@ int main(int argc, char** argv){
   }
 
   parallelMIMCMC.Finalize();
-  remove("FullParallelMLMCMC.hdf5");
+
+  comm->Barrier();
+  if (comm->GetRank() == 0)
+    remove("FullParallelMLMCMC.hdf5");
+  comm->Barrier();
+
   parallelMIMCMC.WriteToFile("FullParallelMLMCMC.hdf5");
 
 
