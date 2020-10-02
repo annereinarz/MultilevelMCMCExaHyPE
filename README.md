@@ -36,3 +36,53 @@ The application can then be compiled using
 Running your binary requires the .exahype2 file to be passed:
 
   mpirun -np 4 ./MultilevelExaHyPE [Path-to-ExaHyPE]/ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADC_ADERDG.exahype2
+
+
+
+# Notes for SuperMUC
+
+##MUQ deps:
+
+push MUQ dependencies as archives pushed onto supermuc
+
+##Modules:
+module load tbb
+module load python/3.6_intel
+
+##ExaHyPE:
+
+git clone git@gitlab.lrz.de:exahype/ExaHyPE-Engine.git
+git checkout reinarz/muq
+
+getting submodules via SSH:
+
+./updateSubmodules.sh -s
+./updateSubmodules.sh
+
+
+
+export COMPILER_CFLAGS=-DEXAHYPE_LATE_TAKEOVER
+export EXAHYPE_LATE_TAKEOVER
+
+In SWE_MC_ADERDG_l.exahype2:
+        "architecture": "skx",
+
+../../../Toolkit/toolkit.sh ../SWE_MC_ADERDG_l.exahype2
+make -j40 link_muq
+
+#MUQ:
+
+git clone git@bitbucket.org:mituq/muq2.git
+
+git checkout linus/mimcmc
+
+Adapt paths to your local archives!
+cmake -DCMAKE_CXX_FLAGS="-std=c++0x" -DMUQ_USE_OPENMP=OFF -DMUQ_USE_MPI=ON -DCMAKE_CXX_COMPILER=mpiicpc -DMPI_CXX_COMPILER=mpiicpc -DCMAKE_INSTALL_PREFIX=$PWD/install -DPARCER_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/parcer.zip -DHDF5_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/CMake-hdf5-1.8.19.tar.gz -DEIGEN_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/3.3.4.tar.bz2 -DNLOPT_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/nlopt-2.4.2.tar.gz -DBOOST_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/boost_1_63_0.tar.gz -DNANOFLANN_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/nanoflann.zip -DSTANMATH_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/stanmath.zip ..
+
+make -j40 install
+
+#MUQ+ExaHyPE:
+
+git clone git@github.com:annereinarz/MultilevelMCMCExaHyPE.git
+
+cmake -DCMAKE_PREFIX_PATH=$HOME/exahype/muq2/build -DEXAHYPE_PATH=$HOME/exahype/ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADERDG ..
