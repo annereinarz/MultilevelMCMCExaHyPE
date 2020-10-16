@@ -49,7 +49,6 @@ module load tbb
 module load python/3.6_intel
 
 ##ExaHyPE:
-
 git clone git@gitlab.lrz.de:exahype/ExaHyPE-Engine.git
 git checkout reinarz/muq
 
@@ -61,10 +60,10 @@ getting submodules via SSH:
 export COMPILER_CFLAGS=-DEXAHYPE_LATE_TAKEOVER
 export EXAHYPE_LATE_TAKEOVER
 
-In SWE_MC_ADERDG_l.exahype2:
+In ApplicationExamples/SWE/SWE_MC_ADERDG_l.exahype2 set:
         "architecture": "skx",
 
-../../../Toolkit/toolkit.sh ../SWE_MC_ADERDG_l.exahype2
+../../Toolkit/toolkit.sh SWE_MC_ADERDG_l.exahype2
 make -j40 link_muq
 
 #MUQ:
@@ -74,7 +73,7 @@ git clone git@bitbucket.org:mituq/muq2.git
 git checkout linus/mimcmc
 
 Adapt paths to your local archives!
-cmake -DCMAKE_CXX_FLAGS="-std=c++0x" -DMUQ_USE_OPENMP=OFF -DMUQ_USE_MPI=ON -DCMAKE_CXX_COMPILER=mpiicpc -DMPI_CXX_COMPILER=mpiicpc -DCMAKE_INSTALL_PREFIX=$PWD/install -DPARCER_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/parcer.zip -DHDF5_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/CMake-hdf5-1.8.19.tar.gz -DEIGEN_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/3.3.4.tar.bz2 -DNLOPT_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/nlopt-2.4.2.tar.gz -DBOOST_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/boost_1_63_0.tar.gz -DNANOFLANN_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/nanoflann.zip -DSTANMATH_EXTERNAL_SOURCE=$HOME/exahype/muq_deps/stanmath.zip ..
+cmake -DCMAKE_CXX_FLAGS="-std=c++0x" -DMUQ_USE_OPENMP=OFF -DMUQ_USE_MPI=ON -DCMAKE_CXX_COMPILER=mpiicpc -DMPI_CXX_COMPILER=mpiicpc -DCMAKE_INSTALL_PREFIX=$PWD/install -DPARCER_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/parcer.zip -DHDF5_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/CMake-hdf5-1.8.19.tar.gz -DEIGEN_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/eigen-3.3.7.tar.bz2 -DNLOPT_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/nlopt-2.4.2.tar.gz -DBOOST_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/boost_1_63_0.tar.gz -DNANOFLANN_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/nanoflann.zip -DSTANMATH_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/stanmath.zip ..
 
 make -j40 install
 
@@ -82,4 +81,4 @@ make -j40 install
 
 git clone git@github.com:annereinarz/MultilevelMCMCExaHyPE.git
 
-cmake -DCMAKE_PREFIX_PATH=$HOME/exahype/muq2/build -DEXAHYPE_PATH=$HOME/exahype/ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADERDG ..
+cmake -DCMAKE_PREFIX_PATH=$HOME/MUQ/muq2/build -DEXAHYPE_PATH=$HOME/MUQ/ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADERDG ..

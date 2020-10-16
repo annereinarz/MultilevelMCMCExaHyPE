@@ -11,6 +11,10 @@ wget http://ab-initio.mit.edu/nlopt/nlopt-2.4.2.tar.gz
 wget https://bitbucket.org/mituq/parcer/get/master.zip
 wget https://github.com/stan-dev/math/archive/release/v2.18.0.zip
 
+mv master.zip nanoflann.zip
+mv master.zip.1 parcer.zip
+mv v2.18.0.zip stanmath.zip
+
 cd ..
 tar -czvf muq_dependencies.tar.gz muq_dependencies
 
