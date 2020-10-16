@@ -42,8 +42,7 @@ Running your binary requires the .exahype2 file to be passed:
 # Notes for SuperMUC
 
 ##MUQ deps:
-
-push MUQ dependencies as archives pushed onto supermuc
+since gaining access to all external repositories is a lot of work: use the download_dependencies script to download them and push MUQ dependencies as archives onto supermuc
 
 ##Modules:
 module load tbb
@@ -58,8 +57,6 @@ getting submodules via SSH:
 
 ./updateSubmodules.sh -s
 ./updateSubmodules.sh
-
-
 
 export COMPILER_CFLAGS=-DEXAHYPE_LATE_TAKEOVER
 export EXAHYPE_LATE_TAKEOVER
