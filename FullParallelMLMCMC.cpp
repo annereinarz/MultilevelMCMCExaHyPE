@@ -66,7 +66,7 @@ int main(int argc, char** argv){
   muq::init(argc,argv);
   count = 0;
 
-  std::time_t result = std::time(nullptr);  std::string timestamp = std::asctime(std::localtime(&result));
+  std::time_t result = std::time(nullptr);
   std::string timestamp = std::asctime(std::localtime(&result));
   auto tracer = std::make_shared<OTF2Tracer>("trace",timestamp);
 
