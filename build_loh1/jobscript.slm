@@ -1,0 +1,35 @@
+#!/bin/bash
+#SBATCH --account=pr83no
+
+# Job Name and Files (also --job-name)
+#SBATCH -J slmcmc
+#SBATCH --partition=micro
+
+#Output and error (also --output, --error):
+#SBATCH -o ./%x.%j.out
+#SBATCH -e ./%x.%j.err
+
+#Initial working directory (also --chdir):
+# # #SBATCH -D ./
+
+#Notification and type
+#SBATCH --mail-type=END
+#SBATCH --mail-user=[mail]
+
+# Wall clock limit:
+#SBATCH --time=02:00:00
+#SBATCH --no-requeue
+
+#SBATCH --exclusive
+#SBATCH --mem=MaxMemPerNode
+
+# set number of nodes
+#SBATCH --nodes=14
+#SBATCH --ntasks=28
+# #SBATCH --cpus-per-task=7
+
+export OMP_NUM_THREADS=24
+source ~/.bashrc
+
+# run the application
+srun -n $SLURM_NTASKS  ./SLMCMC [specfile.exahype2]
