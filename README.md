@@ -47,6 +47,7 @@ since gaining access to all external repositories is a lot of work: use the down
 ##Modules:
 module load tbb
 module load python/3.6_intel
+module load cmake/3.10
 
 ##ExaHyPE:
 git clone git@gitlab.lrz.de:exahype/ExaHyPE-Engine.git
