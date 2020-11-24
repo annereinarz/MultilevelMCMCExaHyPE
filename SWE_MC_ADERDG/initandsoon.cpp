@@ -123,9 +123,9 @@ int init(int argc, char** argv) {
     return sharedMemorySetup;
   }
 
-  if (runPingPong) {
+  /*if (runPingPong) {
     return exahype::pingPongTest();
-  }
+  }*/
 
   if (runTests) {
     //
