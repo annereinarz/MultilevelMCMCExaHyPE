@@ -10,7 +10,7 @@
 
 #include <initandsoon.h>
 
-#include "calculateLikelihood_LOH1.hh"
+#include "calculateLikelihood.hh"
 
 namespace pt = boost::property_tree;
 using namespace muq::Modeling;

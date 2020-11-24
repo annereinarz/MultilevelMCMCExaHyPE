@@ -1,0 +1,99 @@
+{
+    "project_name": "SWE",
+        "paths": {
+            "peano_kernel_path": "./Peano",
+            "exahype_path": "./ExaHyPE",
+            "output_directory": "./ApplicationExamples/SWE/SWE_MC_ADERDG",
+            "log_file": "mylogfile.log"
+        },
+        "architecture": "hsw",
+        "computational_domain": {
+            "dimension": 2,
+            "end_time": 0.1,
+            "offset": [
+                0.0,
+                0.0
+            ],
+            "width": [
+                1.0,
+	    	    1.0
+            ]
+        },
+	"distributed_memory": {
+		"timeout": 3600,
+		"load_balancing_type": "static",
+		"buffer_size": 640000,
+		"load_balancing_strategy": "hotspot",
+		"node_pool_strategy": "fair",
+		"ranks_per_node": 1
+	},
+        "solvers": [
+        {
+            "type": "Limiting-ADER-DG",
+            "name": "MySWESolver",
+            "order": 1,
+            "maximum_mesh_size": 0.04,
+            "maximum_mesh_depth": 1,
+            "time_stepping": "global",
+            "aderdg_kernel": {
+                "language": "C",
+                "nonlinear": true,
+                "terms": [
+                    "flux",
+                    "ncp"
+                ],
+                "space_time_predictor": {},
+                "optimised_terms": [],
+                "optimised_kernel_debugging": [],
+                "implementation": "generic",
+                "adjust_solution": "patchwise",
+                "allocate_temporary_arrays": "stack"
+            },
+            "point_sources": 0,
+            "limiter": {
+                "dmp_observables": 0,
+                "dmp_relaxation_parameter": 100000000.0,
+                "dmp_difference_scaling": 100000000.0,
+                "implementation": "generic"
+            },
+            "fv_kernel": {
+                "language": "C",
+                "terms": [
+                    "flux",
+                    "ncp"
+                ],
+                "scheme": "godunov",
+                "implementation": "generic",
+                "allocate_temporary_arrays": "stack"
+            },
+            "variables": [
+            {
+                "name": "h",
+                "multiplicity": 1
+            },
+            {
+                "name": "hu",
+                "multiplicity": 1
+            },
+            {
+                "name": "hv",
+                "multiplicity": 1
+            },
+            {
+                "name": "b",
+                "multiplicity": 1
+            }
+            ],
+            "plotters": [
+            {
+                "type": "vtk::Cartesian::cells::ascii",
+                "name": "ConservedWriter",
+                "time": 0.0,
+                "repeat": 0.01,
+                "output": "./vtk-output/conserved",
+                "variables": 5
+            }
+            ]
+        }
+    ]
+}

@@ -61,7 +61,10 @@ double calculateLikelihood(std::vector<double> solution){
         std::cout << "Probe diff " << i_probe << " " << diff << std::endl;
         }*/
         std::cout << "Solution " << i_probe - 1 << " "  << solution[i_probe-1] << std::endl;
-        diff-=solution[i_probe-1];
+        if(std::isfinite(solution[i_probe-1]))
+		diff-=solution[i_probe-1];
+	else
+	   return 0;
 
         std::cout << "Diff     " << i_probe - 1 << " " << diff << std::endl;
         

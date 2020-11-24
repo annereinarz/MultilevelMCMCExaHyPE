@@ -41,24 +41,28 @@ public:
     }
 
     //Create some debug output
-    std::cout << "parameter:" << state->state[0].transpose() << std::endl;
+    if(comm->GetRank()==0){
+	    std::cout << "parameter:" << state->state[0].transpose() << std::endl;
 
-    std::ofstream ost;
-    ost.open("parameters.log", std::ios::app);
-    ost << param[0] << ", " << param[1] << std::endl;
-    ost.close();
+	    std::ofstream ost;
+	    ost.open("parameters.log", std::ios::app);
+	    ost << param[0] << ", " << param[1] << std::endl;
+	    ost.close();
 
-    std::cout << "Sample number: " << count++ << std::endl;
-    std::cout << "Parameter " << param[0] << " " << param[1] << std::endl;
+	    std::cout << "Sample number: " << count++ << std::endl;
+	    std::cout << "Parameter " << param[0] << " " << param[1] << std::endl;
+    }
 
     //Discard stupid parameters
     if (param[0] >1.0 || param[0] < -0.1 || param[1]>1.0 || param[1]<-0.1)//reject parameters outside domain
         return -24;
 
     //run forward model
-    int level = index->GetValue(0);
-    std::cout << "run_exahype with level " << level << std::endl;
-    auto output = muq::run_exahype(param,level);
+    //int level = index->GetValue(0);
+    //std::cout << "run_exahype with level " << level << std::endl;
+    auto output = muq::run_exahype(param,0);
+    /*for(int i = 0; i< output.size(); i++) 
+	    std::cout << "output " << i << " is " << output[i] << std::endl;*/
 
     comm->Barrier();
     double sigma = 1.0;
@@ -137,7 +141,7 @@ public:
 
   virtual Eigen::VectorXd StartingPoint (std::shared_ptr<MultiIndex> const& index) override {
     //Starting guess: zero
-      Eigen::VectorXd start = Eigen::VectorXd::Ones(NUM_PARAM);
+    Eigen::VectorXd start = Eigen::VectorXd::Ones(NUM_PARAM);
     start(0) = .6;
     start(1) = .6;
     return start;
