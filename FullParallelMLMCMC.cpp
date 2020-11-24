@@ -19,6 +19,7 @@ using namespace muq::Utilities;
 
 #include <fstream>
 #include <stdio.h>
+#include <ctime>
 
 #include "problem.h"
 
@@ -65,6 +66,10 @@ int main(int argc, char** argv){
   muq::init(argc,argv);
   count = 0;
 
+  std::time_t result = std::time(nullptr);
+  std::string timestamp = std::asctime(std::localtime(&result));
+  auto tracer = std::make_shared<OTF2Tracer>("trace",timestamp);
+
 { // Inverse UQ
   auto componentFactory = std::make_shared<MyMIComponentFactory>();
 
@@ -81,13 +86,13 @@ int main(int argc, char** argv){
   auto comm = std::make_shared<parcer::Communicator>();
   componentFactory->SetComm(comm);
 
-  StaticLoadBalancingMIMCMC parallelMIMCMC (pt, componentFactory);
+  StaticLoadBalancingMIMCMC parallelMIMCMC (pt, componentFactory, std::make_shared<RoundRobinStaticLoadBalancer>(), std::make_shared<parcer::Communicator>(), tracer);
   if (comm->GetRank() == 0) {
     parallelMIMCMC.Run();
     Eigen::VectorXd meanQOI = parallelMIMCMC.MeanQOI();
     std::cout << "mean QOI: " << meanQOI.transpose() << std::endl;
   }
-
+  parallelMIMCMC.WriteToFile("parallelMIMCMC.h5");
   parallelMIMCMC.Finalize();
 
   comm->Barrier();
@@ -99,6 +104,8 @@ int main(int argc, char** argv){
 
 
 }
+
+  tracer->write();
 
   muq::finalize();
   MPI_Finalize();

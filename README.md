@@ -47,6 +47,7 @@ since gaining access to all external repositories is a lot of work: use the down
 ##Modules:
 module load tbb
 module load python/3.6_intel
+module load cmake/3.10
 
 ##ExaHyPE:
 git clone git@gitlab.lrz.de:exahype/ExaHyPE-Engine.git
@@ -69,8 +70,6 @@ make -j40 link_muq
 #MUQ:
 
 git clone git@bitbucket.org:mituq/muq2.git
-
-git checkout linus/mimcmc
 
 Adapt paths to your local archives!
 cmake -DCMAKE_CXX_FLAGS="-std=c++0x" -DMUQ_USE_OPENMP=OFF -DMUQ_USE_MPI=ON -DCMAKE_CXX_COMPILER=mpiicpc -DMPI_CXX_COMPILER=mpiicpc -DCMAKE_INSTALL_PREFIX=$PWD/install -DPARCER_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/parcer.zip -DHDF5_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/CMake-hdf5-1.8.19.tar.gz -DEIGEN_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/eigen-3.3.7.tar.bz2 -DNLOPT_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/nlopt-2.4.2.tar.gz -DBOOST_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/boost_1_63_0.tar.gz -DNANOFLANN_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/nanoflann.zip -DSTANMATH_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/stanmath.zip ..
