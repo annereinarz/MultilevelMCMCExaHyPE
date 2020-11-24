@@ -1,12 +1,12 @@
 {
     "project_name": "SWE",
         "paths": {
-            "peano_kernel_path": "./Peano",
-            "exahype_path": "./ExaHyPE",
-            "output_directory": "./ApplicationExamples/SWE/SWE_MC_ADERDG",
+            "peano_kernel_path": "../ExaHyPE-Engine/Peano",
+            "exahype_path": "../ExaHyPE-Engine/ExaHyPE",
+            "output_directory": "../MultilevelMCMCExaHyPE/SWE_MC_ADERDG",
             "log_file": "mylogfile.log"
         },
-        "architecture": "hsw",
+        "architecture": "skx",
         "computational_domain": {
             "dimension": 2,
             "end_time": 0.1,
