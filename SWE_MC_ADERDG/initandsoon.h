@@ -19,7 +19,7 @@ namespace muq{
 
     int init(int argc, char** argv) ;
 
-    std::vector<double> run_exahype(std::vector<double> param);
+    std::vector<double> run_exahype(std::vector<double> param, int level=0);
 
     int finalize();
 

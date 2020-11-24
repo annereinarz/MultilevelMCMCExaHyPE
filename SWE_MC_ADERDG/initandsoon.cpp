@@ -236,7 +236,7 @@ int init(int argc, char** argv) {
   return 0;
   }
 
-  std::vector<double> run_exahype(std::vector<double> param_){
+  std::vector<double> run_exahype(std::vector<double> param_, int level=0){
     muq::param.resize(1);
     int numProbes = 4;
     muq::solution.resize(numProbes);
