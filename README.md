@@ -5,13 +5,9 @@ This is the MUQ interface for ExaHyPE. To run a MCMC chain you need to install b
 In ExaHyPE it is important to use the reinarz/muq branch and to switch Peano to the muq branch as well.
 Also, in muq, currently use the linus/mimcmc branch until that is merged in master.
 
-Navigate to
+You must then run the toolkit (here it is assumed that ExaHyPE-Engine lies one folder above MultilevelMCMCExaHyPE, if not supply the correct path)
 
-  ExaHyPE-Engine/ApplicationExamples/SWE/SWE_MC_ADERDG
-
-You must then run the toolkit
-
-  ../../../Toolkit/toolkit.sh ../SWE_MC_ADERDG.exahype2
+  ../ExaHyPE-Engine/Toolkit/toolkit.sh SWE_MC_ADERDG.exahype2
 
 Now set the exports noted in export.sh to set options. Finally, call
 
