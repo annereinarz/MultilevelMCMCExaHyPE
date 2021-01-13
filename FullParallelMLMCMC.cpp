@@ -83,10 +83,10 @@ int main(int argc, char** argv){
   pt.put("NumSamples_0", 1e2);
   pt.put("NumSamples_1", 5e1);
 
-  auto comm = std::make_shared<parcer::Communicator>();
+  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
   componentFactory->SetComm(comm);
 
-  StaticLoadBalancingMIMCMC parallelMIMCMC (pt, componentFactory, std::make_shared<RoundRobinStaticLoadBalancer>(), std::make_shared<parcer::Communicator>(), tracer);
+  StaticLoadBalancingMIMCMC parallelMIMCMC (pt, componentFactory, std::make_shared<RoundRobinStaticLoadBalancer>(), comm, tracer);
   if (comm->GetRank() == 0) {
     parallelMIMCMC.Run();
     Eigen::VectorXd meanQOI = parallelMIMCMC.MeanQOI();

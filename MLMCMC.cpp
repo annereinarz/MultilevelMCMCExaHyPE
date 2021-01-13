@@ -42,7 +42,7 @@ int main(int argc, char** argv){
   pt.put("NumSamples_0", 1e2);
   pt.put("NumSamples_1", 5e1);
 
-  auto comm = std::make_shared<parcer::Communicator>();
+  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
   localFactory->SetComm(comm);
   auto componentFactory = std::make_shared<ParallelMIComponentFactory>(comm, comm, localFactory);
 
