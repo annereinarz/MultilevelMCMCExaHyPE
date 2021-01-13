@@ -42,7 +42,11 @@ int main(int argc, char** argv){
   pt.put("NumSamples_0", 1e2);
   pt.put("NumSamples_1", 5e1);
 
-  auto comm = std::make_shared<parcer::Communicator>();
+  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
+  if (comm->GetSize() != 1) {
+    std::cerr << "This program is intended to run on only 1 MPI rank!" << std::endl;
+    return;
+  }
   localFactory->SetComm(comm);
   auto componentFactory = std::make_shared<ParallelMIComponentFactory>(comm, comm, localFactory);
 
