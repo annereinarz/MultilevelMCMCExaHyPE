@@ -83,6 +83,7 @@ int main(int argc, char** argv){
   pt.put("NumSamples_0", 1e2);
   pt.put("NumSamples_1", 5e1);
   pt.put("MLMCMC.Scheduling", true);
+  pt.put("MLMCMC.Subsampling", 10);
 
   auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
   componentFactory->SetComm(comm);
