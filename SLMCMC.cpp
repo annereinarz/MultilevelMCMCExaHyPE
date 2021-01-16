@@ -30,7 +30,8 @@ int main(int argc, char** argv){
   count = 0;
 
 { // Inverse UQ
-  auto localFactory = std::make_shared<MyMIComponentFactory>();
+  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
+  auto localFactory = std::make_shared<MyMIComponentFactory>(comm);
 
   pt::ptree pt;
 
@@ -42,7 +43,6 @@ int main(int argc, char** argv){
   pt.put("NumSamples_0", 1e2);
   pt.put("NumSamples_1", 5e1);
 
-  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
   localFactory->SetComm(comm);
   auto componentFactory = std::make_shared<ParallelMIComponentFactory>(comm, comm, localFactory);
 
