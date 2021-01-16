@@ -70,8 +70,10 @@ int main(int argc, char** argv){
   std::string timestamp = std::asctime(std::localtime(&result));
   auto tracer = std::make_shared<OTF2Tracer>("trace",timestamp);
 
+  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
+
 { // Inverse UQ
-  auto componentFactory = std::make_shared<MyMIComponentFactory>();
+  auto componentFactory = std::make_shared<MyMIComponentFactory>(comm);
 
   pt::ptree pt;
 
@@ -85,8 +87,6 @@ int main(int argc, char** argv){
   pt.put("MLMCMC.Scheduling", true);
   pt.put("MLMCMC.Subsampling", 10);
 
-  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
-  componentFactory->SetComm(comm);
 
   StaticLoadBalancingMIMCMC parallelMIMCMC (pt, componentFactory, std::make_shared<RoundRobinStaticLoadBalancer>(), comm, tracer);
   if (comm->GetRank() == 0) {

@@ -13,10 +13,11 @@ const static Eigen::IOFormat CSVFormat(Eigen::FullPrecision, 0, ", ", ";\n", "",
 
 class MySamplingProblem : public AbstractSamplingProblem {
 public:
-  MySamplingProblem(std::shared_ptr<parcer::Communicator> comm,std::shared_ptr<MultiIndex> index)
+  MySamplingProblem(std::shared_ptr<parcer::Communicator> comm,std::shared_ptr<parcer::Communicator> globalComm,std::shared_ptr<MultiIndex> index)
   : AbstractSamplingProblem(Eigen::VectorXi::Constant(1,NUM_PARAM), Eigen::VectorXi::Constant(1,NUM_PARAM))
 {
     this->comm = comm;
+    this->globalComm = globalComm;
     this->index = index;
     muq::setCommunicator(comm->GetMPICommunicator());
 
@@ -45,7 +46,7 @@ public:
 	    std::cout << "parameter:" << state->state[0].transpose() << std::endl;
 
 	    std::ofstream ost;
-	    ost.open("parameters.log", std::ios::app);
+	    ost.open("parameters_r" + std::to_string(globalComm->GetRank()) + ".log", std::ios::app);
 	    ost << param[0] << ", " << param[1] << std::endl;
 	    ost.close();
 
@@ -61,7 +62,7 @@ public:
     //int level = index->GetValue(0);
     //std::cout << "run_exahype with level " << level << std::endl;
     auto output = muq::run_exahype(param,0);
-    /*for(int i = 0; i< output.size(); i++) 
+    /*for(int i = 0; i< output.size(); i++)
 	    std::cout << "output " << i << " is " << output[i] << std::endl;*/
 
     comm->Barrier();
@@ -77,6 +78,7 @@ public:
 private:
   std::shared_ptr<SamplingState> lastState = nullptr;
   std::shared_ptr<parcer::Communicator> comm;
+  std::shared_ptr<parcer::Communicator> globalComm;
   std::shared_ptr<MultiIndex> index;
 };
 
@@ -90,6 +92,8 @@ public:
 
 class MyMIComponentFactory : public ParallelizableMIComponentFactory {
 public:
+  MyMIComponentFactory(std::shared_ptr<parcer::Communicator> globalComm) : _globalComm(globalComm) {}
+
   virtual std::shared_ptr<MCMCProposal> Proposal (std::shared_ptr<MultiIndex> const& index, std::shared_ptr<AbstractSamplingProblem> const& samplingProblem) override {
     pt::ptree pt;
     pt.put("BlockIndex",0);
@@ -132,7 +136,7 @@ public:
 
   virtual std::shared_ptr<AbstractSamplingProblem> SamplingProblem (std::shared_ptr<MultiIndex> const& index) override {
 
-    return std::make_shared<MySamplingProblem>(_comm,index);
+    return std::make_shared<MySamplingProblem>(_comm,_globalComm,index);
   }
 
   virtual std::shared_ptr<MIInterpolation> Interpolation (std::shared_ptr<MultiIndex> const& index) override {
@@ -149,5 +153,6 @@ public:
 
 private:
   std::shared_ptr<parcer::Communicator> _comm;
+  std::shared_ptr<parcer::Communicator> _globalComm;
 
 };
