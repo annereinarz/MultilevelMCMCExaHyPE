@@ -23,7 +23,6 @@ using namespace muq::Utilities;
 
 #include "problem.h"
 
-/*
 // NOTE: We only need our own static load balancing in case 1 proc per node plus TBB won't be enough
 
 class MyStaticLoadBalancer : public StaticLoadBalancer {
@@ -41,8 +40,8 @@ class MyStaticLoadBalancer : public StaticLoadBalancer {
       }
       WorkerAssignment numWorkers(std::shared_ptr<MultiIndex> modelIndex) override {
         WorkerAssignment assignment;
-        assignment.numWorkersPerGroup = 1;
-        assignment.numGroups = ranks_remaining / models_remaining;
+        assignment.numWorkersPerGroup = 4;
+        assignment.numGroups = (ranks_remaining / models_remaining) / 4;
 
         spdlog::debug("Of {}, assigning {} to model {}", ranks_remaining, assignment.numGroups * assignment.numWorkersPerGroup, *modelIndex);
 
@@ -51,13 +50,15 @@ class MyStaticLoadBalancer : public StaticLoadBalancer {
         models_remaining--;
         ranks_remaining -= assignment.numGroups * assignment.numWorkersPerGroup;
 
+        assert (ranks_remaining >= 0);
+
         return assignment;
       }
     private:
       uint ranks_remaining;
       uint models_remaining;
 
-};*/
+};
 
 int main(int argc, char** argv){
   int initThreadProvidedThreadLevelSupport;
@@ -88,7 +89,7 @@ int main(int argc, char** argv){
   pt.put("MLMCMC.Subsampling", 10);
 
 
-  StaticLoadBalancingMIMCMC parallelMIMCMC (pt, componentFactory, std::make_shared<RoundRobinStaticLoadBalancer>(), comm, tracer);
+  StaticLoadBalancingMIMCMC parallelMIMCMC (pt, componentFactory, std::make_shared<MyStaticLoadBalancer>(), comm, tracer);
   if (comm->GetRank() == 0) {
     parallelMIMCMC.Run();
     Eigen::VectorXd meanQOI = parallelMIMCMC.MeanQOI();
