@@ -43,15 +43,15 @@ public:
 
     //Create some debug output
     if(comm->GetRank()==0){
-	    std::cout << "parameter:" << state->state[0].transpose() << std::endl;
+	    //std::cout << "parameter:" << state->state[0].transpose() << std::endl;
 
 	    std::ofstream ost;
 	    ost.open("parameters_r" + std::to_string(globalComm->GetRank()) + ".log", std::ios::app);
 	    ost << param[0] << ", " << param[1] << std::endl;
 	    ost.close();
 
-	    std::cout << "Sample number: " << count++ << std::endl;
-	    std::cout << "Parameter " << param[0] << " " << param[1] << std::endl;
+	    //std::cout << "Sample number: " << count++ << std::endl;
+	    //std::cout << "Parameter " << param[0] << " " << param[1] << std::endl;
     }
 
     //Discard stupid parameters
@@ -61,13 +61,13 @@ public:
     //run forward model
     //int level = index->GetValue(0);
     //std::cout << "run_exahype with level " << level << std::endl;
-    auto output = muq::run_exahype(param,0);
+    auto output = muq::run_exahype(param,globalComm->GetRank(), 0);
     /*for(int i = 0; i< output.size(); i++)
 	    std::cout << "output " << i << " is " << output[i] << std::endl;*/
 
     comm->Barrier();
     double sigma = 1.0;
-    return calculateLikelihood(output);// - 0.5/(sigma*sigma)*state->state[0].squaredNorm();
+    return calculateLikelihood(output,globalComm->GetRank());// - 0.5/(sigma*sigma)*state->state[0].squaredNorm();
   };
 
   virtual std::shared_ptr<SamplingState> QOI() override {
