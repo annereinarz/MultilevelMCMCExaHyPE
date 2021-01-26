@@ -8,7 +8,7 @@
 //return number
 
 
-double calculateLikelihood(std::vector<double> solution){
+double calculateLikelihood(std::vector<double> solution, int rank){
     int numProbes = 16;
     double likelihood =  0.0;  //0.25*(ll[0] + ll[1] + ll[2] + ll[3]);
 
@@ -60,13 +60,13 @@ double calculateLikelihood(std::vector<double> solution){
         std::cout << "Probe current " << i_probe << " " << dh << std::endl;
         std::cout << "Probe diff " << i_probe << " " << diff << std::endl;
         }*/
-        std::cout << "Solution " << i_probe - 1 << " "  << solution[i_probe-1] << std::endl;
+        //std::cout << "Solution " << i_probe - 1 << " "  << solution[i_probe-1] << std::endl;
         if(std::isfinite(solution[i_probe-1]))
 		diff-=solution[i_probe-1];
 	else
 	   return 0;
 
-        std::cout << "Diff     " << i_probe - 1 << " " << diff << std::endl;
+        //std::cout << "Diff     " << i_probe - 1 << " " << diff << std::endl;
         
         /*std::string arg = "python Output/TFMisfit/TFMisfit.py -r Output/Reference/waveheight"+std::to_string(i_probe+1)+".probe -s Output/waveheight"+std::to_string(i_probe+1)+"-rank-0.probe > Output/output.csv 2> Output/err";
         const char *command = arg.c_str(); 
@@ -87,7 +87,7 @@ double calculateLikelihood(std::vector<double> solution){
         likelihood -= 1.0/numProbes * .5 * diff*diff * 500;
     }
     std::ofstream ost;
-    ost.open("likelihood.log", std::ios::app);
+    ost.open("likelihood_r"+std::to_string(rank)+".log", std::ios::app);
     ost << std::exp(likelihood) << std::endl;
     return likelihood;
 }
