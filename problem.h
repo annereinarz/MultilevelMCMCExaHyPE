@@ -59,9 +59,10 @@ public:
         return -24;
 
     //run forward model
-    //int level = index->GetValue(0);
-    //std::cout << "run_exahype with level " << level << std::endl;
-    auto output = muq::run_exahype(param,globalComm->GetRank(), 0);
+    int level = index->GetValue(0);
+    std::cout << "run_exahype with level " << level << " and global communicator number " << globalComm->GetRank()  << std::endl;
+    //muq::setCommunicator(comm->GetMPICommunicator());
+    auto output = muq::run_exahype(param,globalComm->GetRank(), level);
     /*for(int i = 0; i< output.size(); i++)
 	    std::cout << "output " << i << " is " << output[i] << std::endl;*/
 
