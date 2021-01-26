@@ -61,10 +61,12 @@ class MyStaticLoadBalancer : public StaticLoadBalancer {
 };
 
 int main(int argc, char** argv){
+  saved_argc = argc;
+  saved_argv = argv;
+
   int initThreadProvidedThreadLevelSupport;
   //bool result = MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &initThreadProvidedThreadLevelSupport );
 
-  muq::init(argc,argv);
   count = 0;
 
   std::time_t result = std::time(nullptr);

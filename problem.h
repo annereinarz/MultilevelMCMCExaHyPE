@@ -11,6 +11,8 @@ const int NUM_PARAM = 2;
 int count;
 const static Eigen::IOFormat CSVFormat(Eigen::FullPrecision, 0, ", ", ";\n", "", "", "", ";\n");
 
+int saved_argc; char** saved_argv;
+
 class MySamplingProblem : public AbstractSamplingProblem {
 public:
   MySamplingProblem(std::shared_ptr<parcer::Communicator> comm,std::shared_ptr<parcer::Communicator> globalComm,std::shared_ptr<MultiIndex> index)
@@ -20,7 +22,7 @@ public:
     this->globalComm = globalComm;
     this->index = index;
     muq::setCommunicator(comm->GetMPICommunicator());
-
+    muq::init(saved_argc,saved_argv);
 }
 
   virtual ~MySamplingProblem(){
