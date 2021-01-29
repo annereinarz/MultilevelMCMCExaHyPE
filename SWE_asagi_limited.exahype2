@@ -3,7 +3,7 @@
    "paths": {
 	"peano_kernel_path": "../ExaHyPE-Engine/Peano",
 	"exahype_path": "../ExaHyPE-Engine/ExaHyPE",
-	"output_directory": "../MultilevelMCMCExaHyPE/SWE_MC_ADERDG",
+	"output_directory": "../MultilevelMCMCExaHyPE/SWE_asagi_limited",
 	"log_file": "mylogfile.log"
   },
   "architecture": "skx",
@@ -11,27 +11,27 @@
     "dimension": 2,
     "time_steps": 100,
     "offset": [
-      -10.0,
+      0.0,
       0.0
     ],
     "width": [
-      70.0,
-      1.0
+      7.0,
+      7.0
     ]
   },
   "shared_memory": {
-    "cores": 24,
+    "cores": 48,
     "properties_file": "sharedmemory.properties",
     "autotuning_strategy": "dummy",
     "background_job_consumers": 23
   },
   "distributed_memory": {
-    "timeout": 6000,
+    "timeout": 6000000,
     "load_balancing_type": "static",
     "buffer_size": 1600,
     "load_balancing_strategy": "hotspot",
     "node_pool_strategy": "fair",
-    "ranks_per_node": 2
+    "ranks_per_node": 4
   },
   "optimisation": {
     "fuse_algorithmic_steps": "all",
@@ -110,7 +110,7 @@
           "type": "vtu::Cartesian::cells::limited::ascii",
           "name": "ConservedWriter",
           "time": 0.0,
-          "repeat": 0.01,
+          "repeat": 0.1,
           "output": "./tohoku_output_aderdg/conserved",
           "variables": 5
         },

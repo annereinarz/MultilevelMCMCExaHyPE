@@ -16,13 +16,11 @@
 
 
 namespace muq{
-
     int init(int argc, char** argv) ;
     std::vector<double> run_exahype(std::vector<double> param, int sr, int level=0);
     int finalize();
     bool setCommunicator(MPI_Comm comm);
-
+    bool initParallelEnvironment(int* argc,char*** argv);
 }
-
 
 #endif

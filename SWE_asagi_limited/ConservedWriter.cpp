@@ -6,6 +6,7 @@
 //   www.exahype.eu
 // ========================
 #include "ConservedWriter.h"
+#include "initandsoon_extern.h"
 
 SWE::ConservedWriter::ConservedWriter(SWE::MySWESolver& solver) {
   // @TODO Please insert your code here.
@@ -32,11 +33,17 @@ void SWE::ConservedWriter::mapQuantities(
     double* const outputQuantities,
     double timeStamp
 ) {
+  for (int i=0; i<5; i++){
+	outputQuantities[i] = 0.0;
+  } 
+  if(muq::subcommunicator_rank>3 && muq::subcommunicator_rank<=7){
   const int writtenUnknowns = 5;
-  for (int i=0; i<writtenUnknowns-1; i++){ 
-    outputQuantities[i] = Q[i];
+  for (int i=0; i<4; i++){ 
+	if(!isnan(Q[i]))
+			outputQuantities[i] = Q[i];
   }
-  outputQuantities[4] = 0;
   if(Q[3] < 0.0)
-      outputQuantities[4] = Q[0] + Q[3];
+	if(!isnan(Q[0]+Q[3]))
+			outputQuantities[4] = Q[0] + Q[3];
+}
 }
