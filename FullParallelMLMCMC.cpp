@@ -65,8 +65,8 @@ int main(int argc, char** argv){
   saved_argv = argv;
 
   int initThreadProvidedThreadLevelSupport;
-  muq::initParallelEnvironment(&argc,&argv);
   //bool result = MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &initThreadProvidedThreadLevelSupport );
+  muq::initParallelEnvironment(&argc,&argv);
 
   count = 0;
 

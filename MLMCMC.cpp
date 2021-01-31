@@ -23,10 +23,9 @@ using namespace muq::Utilities;
 #include "problem.h"
 
 int main(int argc, char** argv){
-  //int initThreadProvidedThreadLevelSupport;
-  //bool result = MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &initThreadProvidedThreadLevelSupport );
-
-  muq::init(argc,argv);
+  saved_argv = argv;
+  saved_argc = argc;
+  muq::initParallelEnvironment(&argc,&argv);
   count = 0;
 
   auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);

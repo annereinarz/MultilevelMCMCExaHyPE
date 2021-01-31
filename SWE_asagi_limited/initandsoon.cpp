@@ -52,6 +52,7 @@ namespace muq{
 	std::vector<double> solution = {};
 
 	int finalize(){
+		peano::releaseCachedData();
 		peano::shutdownParallelEnvironment();
 		peano::shutdownSharedMemoryEnvironment();
 		return 0;//programExitCode;
@@ -103,7 +104,8 @@ namespace muq{
 		}
 
 		// cmdlineargs contains all argv expect the progname.
-		std::vector<std::string> cmdlineargs(argv + 1, argv + argc);
+		std::vector<std::string> cmdlineargs_(argv + 1, argv + argc);
+		cmdlineargs = cmdlineargs_;
 		std::string firstarg = cmdlineargs[0];
 
 		bool showHelp    = firstarg == "-h" || firstarg == "--help";
@@ -174,9 +176,6 @@ namespace muq{
 		//   Parse specification file
 		// =====================================
 		//
-
-		exahype::parser::Parser parser;
-
 		std::stringstream specfile;
 		std::string specFileName;
 		if(runCompiledSpecfile) {
@@ -239,7 +238,6 @@ namespace muq{
 	}
 
 	std::vector<double> run_exahype(std::vector<double> param_, int globalcommunicator_rank_, int level=0){
-
 		std::cout << "Global rank " << globalcommunicator_rank_ << std::endl;
 		muq::subcommunicator_rank = globalcommunicator_rank_;
 
@@ -248,7 +246,7 @@ namespace muq{
 		muq::solution.resize(numProbes);
 		param=param_;  //store parameters
 
-		exahype::runners::Runner runner(parser, cmdlineargs); // TODO Make runner singleton?
+		exahype::runners::Runner runner(parser, cmdlineargs);
 		int programExitCode = runner.run();
 
 		if (programExitCode == 0) {
@@ -263,10 +261,7 @@ namespace muq{
 			logInfo("main()", "quit with error code " << programExitCode);
 		}
 
-		peano::releaseCachedData();
-
 		kernels::finalise();
-
 		return solution;
 	}
 

@@ -23,10 +23,9 @@ using namespace muq::Utilities;
 #include "problem.h"
 
 int main(int argc, char** argv){
-  int initThreadProvidedThreadLevelSupport;
-  //bool result = MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &initThreadProvidedThreadLevelSupport );
-
-  muq::init(argc,argv);
+  saved_argc = argc;
+  saved_argv = argv;
+  muq::initParallelEnvironment(&argc,&argv);
   count = 0;
 
 { // Inverse UQ
