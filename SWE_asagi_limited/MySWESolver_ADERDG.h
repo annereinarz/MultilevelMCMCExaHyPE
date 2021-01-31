@@ -63,9 +63,10 @@ class SWE::MySWESolver_ADERDG : public SWE::AbstractMySWESolver_ADERDG {
      * \param[inout] Q         the conserved variables (and parameters) associated with a quadrature point
      *                         as C array (already allocated).
      */
-    void adjustPointSolution(const double* const x,const double t,const double dt,double* const Q) final override;
 
-    /**
+    void adjustSolution(double* const luh,const tarch::la::Vector<DIMENSIONS,double>& cellCentre,const tarch::la::Vector<DIMENSIONS,double>& cellSize,double t,double dt) final override;
+    
+/**
      * Compute the eigenvalues of the flux tensor per coordinate direction \p d.
      *
      * \param[in] Q  the conserved variables associated with a quadrature node

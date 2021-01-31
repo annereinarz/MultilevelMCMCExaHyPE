@@ -3,7 +3,7 @@
         "paths": {
             "peano_kernel_path": "../ExaHyPE-Engine/Peano",
             "exahype_path": "../ExaHyPE-Engine/ExaHyPE",
-            "output_directory": "../MultilevelMCMCExaHyPE/SWE_MC_ADERDG",
+            "output_directory": "../MultilevelMCMCExaHyPE/SWE_MC_ADERDG_ML",
             "log_file": "mylogfile.log"
         },
         "architecture": "skx",
@@ -90,16 +90,6 @@
                 "name": "b",
                 "multiplicity": 1
             }
-            ],
-            "plotters": [
-            {
-                "type": "vtk::Cartesian::cells::ascii",
-                "name": "ConservedWriter2",
-                "time": 0.0,
-                "repeat": 0.01,
-                "output": "./vtk-output/conserved2",
-                "variables": 5
-            }
             ]
         },
         {
@@ -156,16 +146,6 @@
             {
                 "name": "b",
                 "multiplicity": 1
-            }
-            ],
-            "plotters": [
-            {
-                "type": "vtk::Cartesian::cells::ascii",
-                "name": "ConservedWriter",
-                "time": 0.0,
-                "repeat": 0.01,
-                "output": "./vtk-output/conserved",
-                "variables": 5
             }
             ]
         }

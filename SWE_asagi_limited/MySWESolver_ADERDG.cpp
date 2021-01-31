@@ -13,6 +13,7 @@
 #include "peano/utils/Loop.h"
 #include "kernels/KernelUtils.h"
 #include "../../../ExaHyPE/kernels/GaussLegendreBasis.h"
+#include "initandsoon_extern.h"
 
 using namespace kernels;
 
@@ -29,32 +30,82 @@ void SWE::MySWESolver_ADERDG::init(const std::vector<std::string>& cmdlineargs,c
   }
   if (constants.isValueValidDouble( "epsilon" )) {
     epsilon_DG = constants.getValueAsDouble( "epsilon" )*1.0e-3;
+    std::cout << "Epsilon " << epsilon_DG << std::endl;
   }
   if (constants.isValueValidInt( "scenario" )) {
     initialData= new InitialData(constants.getValueAsInt( "scenario" ));
+    std::cout << "Scenario " << constants.getValueAsInt("scenario") << std::endl;
   }
 
 }
 
-void SWE::MySWESolver_ADERDG::adjustPointSolution(const double* const x,const double t,const double dt,double* const Q) {
+
+bool isInside(std::vector<double> probe_point, const tarch::la::Vector<DIMENSIONS,double>& center, const tarch::la::Vector<DIMENSIONS,double>& dx){
+        bool inIn = true;
+        for(int i=0; i< DIMENSIONS; i++){
+            inIn = (inIn && ( (center[i]+dx[i]) > probe_point[i] && (center[i]-dx[i]) < probe_point[i]) );
+        }
+        return inIn;
+}
+
+double initial_waterheight(double x, double y){
+    if(std::sqrt((x-muq::param[0])*(x-muq::param[0])+(y-muq::param[1])*(y-muq::param[1])) < 0.25) {
+        return 1.0; //h
+    }
+    else{
+        return 1.5; //h
+    }
+}
+
+void SWE::MySWESolver_ADERDG::adjustSolution(double* const luh, const tarch::la::Vector<DIMENSIONS,double>& center, const tarch::la::Vector<DIMENSIONS,double>& dx,double t,double dt){
   // Dimensions                        = 2
   // Number of variables + parameters  = 4 + 0
-  if (tarch::la::equals(t,0.0)) {
-    initialData->getInitialData(x, Q); 
-  }
+    if (tarch::la::equals(t,0.0)) {
 
+
+        constexpr int basisSize = MySWESolver_ADERDG::Order+1;
+        constexpr int numberOfData=MySWESolver_ADERDG::NumberOfParameters+MySWESolver_ADERDG::NumberOfVariables;
+
+        kernels::idx3 id_xyf(basisSize,basisSize,numberOfData);
+        kernels::idx2 id_xy(basisSize,basisSize);
+
+        int num_nodes = basisSize;
+
+        double offset_x=center[0]-0.5*dx[0];
+        double offset_y=center[1]-0.5*dx[1];
+
+        for (int i=0; i< num_nodes; i++){
+            for (int j=0; j< num_nodes; j++){
+
+                double x  =  (offset_x+dx[0]*kernels::legendre::nodes[basisSize-1][i]);
+                double y  =  (offset_y+dx[1]*kernels::legendre::nodes[basisSize-1][j]);
+
+                double b =  0.0;//SWE::linearInterpolation(x,y,a);
+
+                luh[id_xyf(i,j,0)] = initial_waterheight(x,y);
+                luh[id_xyf(i,j,1)] = 0; //hu
+                luh[id_xyf(i,j,2)] = 0; //hv
+                luh[id_xyf(i,j,3)] = b; //b
+            }
+        }
+    }
+  constexpr int order = MySWESolver_ADERDG::Order;
+  constexpr int numberOfUnknowns = MySWESolver_ADERDG::NumberOfVariables;
+  std::vector<std::vector<double>> probe_point = { {0.2,0.2}, {0.4,0.2},
+						   {0.6,0.2}, {0.8,0.2}  };
+  for (int i = 0; i< probe_point.size(); i++){
+	  if( isInside(probe_point[i], center, dx)){
+            muq::solution[i] = 0.0;
+            double center_[DIMENSIONS] ={center[0],center[1]};
+            double dx_[DIMENSIONS] ={dx[0],dx[1]};
+            muq::solution[i] = kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
+        }
+    }
 }
 
 void SWE::MySWESolver_ADERDG::boundaryValues(const double* const x,const double t,const double dt,const int faceIndex,const int normalNonZero,const double* const fluxIn,const double* const stateIn,const double* const gradStateIn,double* const fluxOut,double* const stateOut) {
   // Dimensions                        = 2
   // Number of variables + parameters  = 4 + 0
-
-  //Outflow (not working)
-//    for(int i=0; i < NumberOfVariables; i++) {
-//        fluxOut[i] = fluxIn[i];
-//        stateOut[i] = stateIn[i];
-//    }
-
   //Wall
   std::copy_n(stateIn, NumberOfVariables, stateOut);
   stateOut[1+normalNonZero] =  -stateOut[1+normalNonZero];
@@ -74,26 +125,6 @@ exahype::solvers::Solver::RefinementControl SWE::MySWESolver_ADERDG::refinementC
         largestH = std::max (largestH, vars.h());
         smallestH = std::min(smallestH, vars.h());
     }
-
-    //gradient
-//    if (largestH - smallestH > 5e-2){
-//        return exahype::solvers::Solver::RefinementControl::Refine;
-//    }
-
-    //height
-//    if (smallestH < 3.5 && level > getCoarsestMeshLevel() + 1) {
-//        return exahype::solvers::Solver::RefinementControl::Refine;
-//    }
-//    if (smallestH < 3.7 && level > getCoarsestMeshLevel()) {
-//        return exahype::solvers::Solver::RefinementControl::Refine;
-//    }
-//
-//    if (smallestH < 3.9 && level == getCoarsestMeshLevel()) {
-//        return exahype::solvers::Solver::RefinementControl::Refine;
-//    }
-//
-//    if (level > getCoarsestMeshLevel())
-//        return exahype::solvers::Solver::RefinementControl::Erase;
     return exahype::solvers::Solver::RefinementControl::Keep;
 }
 
@@ -208,16 +239,6 @@ bool SWE::MySWESolver_ADERDG::isPhysicallyAdmissible(
   if(hMin < epsilon_DG * 10.0){
     return false;
   }
-  
-  /*  for(int i = 0 ; i < Order+1 ; i++){
-    for(int j = 0 ; j < Order+1 ; j++){
-      if(solution[id(i,j,0)] < epsilon_DG * 10.0) {
-	return false;
-      }
-    }
-    }*/
-  //  //std::cout <<center[0] << "," << center[1] <<": true" << std::endl;
-
   return true;
 
 }
@@ -301,40 +322,4 @@ void SWE::MySWESolver_ADERDG::riemannSolver(double* const FL,double* const FR,co
 	}
       }
     }
-
-//   std::cout << "QL" << std::endl;
-//   for (int j = 0; j < basisSize; j++) {
-//       for (int k = 0; k < numberOfVariables; k++) {
-// 	std::cout <<QL[idx_FLR(j,k)] << " ";
-//       } std::cout << std::endl;
-//   }
-//   std::cout << "QR" << std::endl;
-//   for (int j = 0; j < basisSize; j++) {
-//       for (int k = 0; k < numberOfVariables; k++) {
-// 	std::cout <<QR[idx_FLR(j,k)] << " ";
-//       } std::cout << std::endl;
-//   }
-
-//   std::cout << "FL" << std::endl;
-//   for (int j = 0; j < basisSize; j++) {
-//       for (int k = 0; k < numberOfVariables; k++) {
-// 	std::cout <<FL[idx_FLR(j,k)] << " ";
-//       } std::cout << std::endl;
-//   }
-
-//   std::cout << "FR" << std::endl;
-//   for (int j = 0; j < basisSize; j++) {
-//       for (int k = 0; k < numberOfVariables; k++) {
-// 	std::cout <<FR[idx_FLR(j,k)] << " ";
-//       } std::cout << std::endl;
-//   }
-
-
-
 }
-
-// void SWE::MySWESolver_ADERDG::mapDiscreteMaximumPrincipleObservables(double* const observables, const double* const Q){
-
-//}
-
-
