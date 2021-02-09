@@ -32,11 +32,6 @@ public:
     comm->Barrier();
     lastState = state;
 
-    //TODO pass directly to exahype
-    //std::ofstream file("Input/parameters.csv");
-    //file << state->state[0].format(CSVFormat);
-    //file.close();
-
     //Write parameters into ExaHyPE readable format
     std::vector<double> param(state->state[0].size());
     for(int i = 0; i < param.size(); i++){
@@ -45,28 +40,26 @@ public:
 
     //Create some debug output
     if(comm->GetRank()==0){
-	    //std::cout << "parameter:" << state->state[0].transpose() << std::endl;
-
 	    std::ofstream ost;
 	    ost.open("parameters_r" + std::to_string(globalComm->GetRank()) + ".log", std::ios::app);
 	    ost << param[0] << ", " << param[1] << std::endl;
 	    ost.close();
-
-	    //std::cout << "Sample number: " << count++ << std::endl;
-	    //std::cout << "Parameter " << param[0] << " " << param[1] << std::endl;
     }
 
     //Discard stupid parameters
-    if (param[0] >1.0 || param[0] < -0.1 || param[1]>1.0 || param[1]<-0.1)//reject parameters outside domain
-        return -24;
+    if (param[0] >7.0 || param[0] < -0.0 || param[1]>7.0 || param[1]<-0.0){ //reject parameters outside domain
+	    std::ofstream ost;
+	    ost.open("likelihood_r"+std::to_string(globalComm->GetRank())+".log", std::ios::app);
+	    ost << std::exp(-24) << std::endl;
+	    return -24;
+    }
 
     //run forward model
     int level = index->GetValue(0);
     std::cout << "run_exahype with level " << level << " and global communicator number " << globalComm->GetRank()  << std::endl;
     //muq::setCommunicator(comm->GetMPICommunicator());
+    //muq::init(saved_argc,saved_argv);
     auto output = muq::run_exahype(param,globalComm->GetRank(), level);
-    /*for(int i = 0; i< output.size(); i++)
-	    std::cout << "output " << i << " is " << output[i] << std::endl;*/
 
     comm->Barrier();
     double sigma = 1.0;

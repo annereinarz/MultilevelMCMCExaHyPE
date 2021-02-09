@@ -5,7 +5,6 @@
 namespace easi {
   class YAMLParser;
   class Component;
-  class ArraysAdapter;
 };
 class AsagiReader;
 #endif

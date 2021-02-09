@@ -52,6 +52,7 @@ namespace muq{
 	std::vector<double> solution = {};
 
 	int finalize(){
+		kernels::finalise();
 		peano::releaseCachedData();
 		peano::shutdownParallelEnvironment();
 		peano::shutdownSharedMemoryEnvironment();
@@ -247,7 +248,7 @@ namespace muq{
 		param=param_;  //store parameters
 
 		exahype::runners::Runner runner(parser, cmdlineargs);
-		int programExitCode = runner.run();
+		int programExitCode = runner.run(0);
 
 		if (programExitCode == 0) {
 #ifdef Parallel
@@ -261,7 +262,6 @@ namespace muq{
 			logInfo("main()", "quit with error code " << programExitCode);
 		}
 
-		kernels::finalise();
 		return solution;
 	}
 

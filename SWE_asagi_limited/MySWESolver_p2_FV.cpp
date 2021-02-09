@@ -1,32 +1,32 @@
-#include "MySWESolver_FV.h"
-#include "MySWESolver_FV_Variables.h"
+#include "MySWESolver_p2_FV.h"
+#include "MySWESolver_p2_FV_Variables.h"
 
 #include "kernels/KernelUtils.h"
 #include "initandsoon_extern.h"
 
 using namespace kernels;
 
-double grav;
-double epsilon;
-int scenario;
+double grav_p2;
+double epsilon_p2;
+int scenario_p2;
 
-tarch::logging::Log SWE::MySWESolver_FV::_log( "SWE::MySWESolver_FV" );
+tarch::logging::Log SWE::MySWESolver_p2_FV::_log( "SWE::MySWESolver_p2_FV" );
 
-void SWE::MySWESolver_FV::init(const std::vector<std::string>& cmdlineargs,const exahype::parser::ParserView& constants) {
-    if (constants.isValueValidDouble( "grav" )) {
-        grav = constants.getValueAsDouble("grav")/1000.0;
+void SWE::MySWESolver_p2_FV::init(const std::vector<std::string>& cmdlineargs,const exahype::parser::ParserView& constants) {
+    if (constants.isValueValidDouble( "grav_p2" )) {
+        grav_p2 = constants.getValueAsDouble("grav_p2")/1000.0;
     }
-    if (constants.isValueValidDouble( "epsilon" )) {
-        epsilon = constants.getValueAsDouble( "epsilon" )/100.0;
+    if (constants.isValueValidDouble( "epsilon_p2" )) {
+        epsilon_p2 = constants.getValueAsDouble( "epsilon_p2" )/100.0;
     }
-    if (constants.isValueValidInt( "scenario" )) {
-      initialData= new InitialData(constants.getValueAsInt( "scenario" ));
+    if (constants.isValueValidInt( "scenario_p2" )) {
+      initialData= new InitialData(constants.getValueAsInt( "scenario_p2" ));
     }
 }
 
 
 
-void SWE::MySWESolver_FV::adjustSolution(const double* const x,const double t,const double dt, double* const Q) {
+void SWE::MySWESolver_p2_FV::adjustSolution(const double* const x,const double t,const double dt, double* const Q) {
   // Dimensions             = 2
   // Number of variables    = 4 + #parameters
 
@@ -34,12 +34,12 @@ void SWE::MySWESolver_FV::adjustSolution(const double* const x,const double t,co
     initialData->getInitialData(x, Q);
   }
   else{
-    if(Q[0] < epsilon){
+    if(Q[0] < epsilon_p2){
       Q[1] = 0;
       Q[2] = 0;      
     }
   }
-  constexpr int numberOfUnknowns = MySWESolver_FV::NumberOfVariables;
+  constexpr int numberOfUnknowns = MySWESolver_p2_FV::NumberOfVariables;
     std::vector<std::vector<double>> probe_point = { {0.2,0.2}, {0.4,0.2},
 						   {0.6,0.2}, {0.8,0.2}  };
     for (int i = 0; i< probe_point.size(); i++){
@@ -49,15 +49,15 @@ void SWE::MySWESolver_FV::adjustSolution(const double* const x,const double t,co
     }
 }
 
-void SWE::MySWESolver_FV::eigenvalues(const double* const Q, const int dIndex, double* const lambda) {
+void SWE::MySWESolver_p2_FV::eigenvalues(const double* const Q, const int dIndex, double* const lambda) {
   // Dimensions             = 2
   // Number of variables    = 4 + #parameters
 
   ReadOnlyVariables vars(Q);
   Variables eigs(lambda);
 
-  const double c = std::sqrt(grav * vars.h());
-  double u_n = Q[dIndex + 1] * vars.h() * std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), epsilon), 4));
+  const double c = std::sqrt(grav_p2 * vars.h());
+  double u_n = Q[dIndex + 1] * vars.h() * std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), epsilon_p2), 4));
 
   eigs.h() = u_n + c;
   eigs.hu() = u_n - c;
@@ -65,12 +65,12 @@ void SWE::MySWESolver_FV::eigenvalues(const double* const Q, const int dIndex, d
   eigs.b() = 0.0;
 
   if(tarch::la::equals(u_n,0.0) && tarch::la::equals(c,0.0)){
-    eigs.h() = std::sqrt(grav * epsilon);
+    eigs.h() = std::sqrt(grav_p2 * epsilon_p2);
   }
 
 }
 
-void SWE::MySWESolver_FV::boundaryValues(
+void SWE::MySWESolver_p2_FV::boundaryValues(
     const double* const x,
     const double t,const double dt,
     const int faceIndex,
@@ -105,7 +105,7 @@ void SWE::MySWESolver_FV::boundaryValues(
 //to add new PDEs specify them in the specification file, delete this file and its header and rerun the toolkit
 
 
-void SWE::MySWESolver_FV::flux(const double* const Q,double** const F) {
+void SWE::MySWESolver_p2_FV::flux(const double* const Q,double** const F) {
   // Dimensions                        = 2
   // Number of variables + parameters  = 4 + 0
  
@@ -114,21 +114,21 @@ void SWE::MySWESolver_FV::flux(const double* const Q,double** const F) {
   double* f = F[0];
   double* g = F[1];
 
-  double u_n = vars.hu() * vars.h() *std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), epsilon), 4));
-  double v_n = vars.hv() * vars.h() *std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), epsilon), 4));
+  double u_n = vars.hu() * vars.h() *std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), epsilon_p2), 4));
+  double v_n = vars.hv() * vars.h() *std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), epsilon_p2), 4));
 
   f[0] = vars.h() * u_n;
-  f[1] = vars.h() * u_n * u_n; // 0.5 * grav * vars.h() * vars.h();
+  f[1] = vars.h() * u_n * u_n; // 0.5 * grav_p2 * vars.h() * vars.h();
   f[2] = vars.h() * u_n * v_n;
   f[3] = 0.0;
 
   g[0] = vars.h() * v_n;
   g[1] = vars.h() * u_n * v_n;
-  g[2] = vars.h() * v_n * v_n; // 0.5 * grav * vars.h() * vars.h();
+  g[2] = vars.h() * v_n * v_n; // 0.5 * grav_p2 * vars.h() * vars.h();
   g[3] = 0.0;
  
 }
-double SWE::MySWESolver_FV::riemannSolver(double* const fL, double* const fR, const double* const qL, const double* const qR, const double* QL, const double* QR, const double* cellSize, int direction){
+double SWE::MySWESolver_p2_FV::riemannSolver(double* const fL, double* const fR, const double* const qL, const double* const qR, const double* QL, const double* QR, const double* cellSize, int direction){
     double LL[NumberOfVariables] = {0.0};
     double LR[NumberOfVariables] = {0.0};
 
@@ -169,7 +169,7 @@ double SWE::MySWESolver_FV::riemannSolver(double* const fL, double* const fR, co
 
     double djump[NumberOfVariables] = {0.0};
 
-    djump[direction + 1] = 0.5*grav*hRoe*Deta;
+    djump[direction + 1] = 0.5*grav_p2*hRoe*Deta;
 
 
     flux[0] = 0.5 * (FL[direction][0] + FR[direction][0]) - 0.5*smax*Deta;
@@ -181,7 +181,7 @@ double SWE::MySWESolver_FV::riemannSolver(double* const fL, double* const fR, co
     return smax;
 }
 
-void SWE::MySWESolver_FV::nonConservativeProduct(const double* const Q,const double* const gradQ,double* const BgradQ) {
+void SWE::MySWESolver_p2_FV::nonConservativeProduct(const double* const Q,const double* const gradQ,double* const BgradQ) {
   //do nothing: Should never be called
   std::cout << "Called fv ncp" << std::endl;
   std::terminate();

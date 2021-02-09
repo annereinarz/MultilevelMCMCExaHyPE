@@ -5,25 +5,25 @@
 // ========================
 //   www.exahype.eu
 // ========================
-#include "ConservedWriter.h"
+#include "ConservedWriter_p3.h"
 
-SWE::ConservedWriter::ConservedWriter(SWE::MySWESolver& solver) {
+SWE::ConservedWriter_p3::ConservedWriter_p3(SWE::MySWESolver_p3& solver) {
   // @TODO Please insert your code here.
 }
 
-SWE::ConservedWriter::~ConservedWriter() {
+SWE::ConservedWriter_p3::~ConservedWriter_p3() {
 }
 
-void SWE::ConservedWriter::startPlotting( double time) {
+void SWE::ConservedWriter_p3::startPlotting( double time) {
   // @TODO Please insert your code here.
 }
 
 
-void SWE::ConservedWriter::finishPlotting() {
+void SWE::ConservedWriter_p3::finishPlotting() {
   // @TODO Please insert your code here.
 }
 
-void SWE::ConservedWriter::mapQuantities(
+void SWE::ConservedWriter_p3::mapQuantities(
     const tarch::la::Vector<DIMENSIONS, double>& offsetOfPatch,
     const tarch::la::Vector<DIMENSIONS, double>& sizeOfPatch,
     const tarch::la::Vector<DIMENSIONS, double>& x,

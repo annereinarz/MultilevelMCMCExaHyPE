@@ -21,26 +21,28 @@ extern int scenario;
 InitialData::InitialData()
         : scenario(1){
 #if defined(USE_ASAGI)
+                std::cout << "Initialising with ASAGI" << std::endl;
                 static tarch::multicore::BooleanSemaphore initializationSemaphoreDG;
                 tarch::multicore::Lock lock(initializationSemaphoreDG);
 
                 asagiReader = new AsagiReader("");
                 parser = new easi::YAMLParser(3, asagiReader);
                 model  = parser->parse("data.yaml");
-               lock.free();
+		lock.free();
 #endif
         }
 
 InitialData::InitialData(int a_scenario)
         : scenario(a_scenario){
 #if defined(USE_ASAGI)
+                std::cout << "Initialising with ASAGI" << std::endl;
                 static tarch::multicore::BooleanSemaphore initializationSemaphoreDG;
                 tarch::multicore::Lock lock(initializationSemaphoreDG);
                 asagiReader = new AsagiReader("");
                 parser = new easi::YAMLParser(3, asagiReader);
                 model  = parser->parse("data.yaml");
                 //Easi binding point for topography
-               lock.free();
+		lock.free();
 #endif
         }
 
@@ -316,27 +318,28 @@ void InitialData::SolitaryWaveOnSimpleBeach(const double*const x, double* Q){
   vars.hu() = -eta * std::sqrt(grav/d) * vars.h();
   vars.hv() = 0.0;
 }
+
 #if defined(USE_ASAGI)
 void InitialData::readAsagiData(const double* const x,double* Q){
-   double bathymetry[1], displacement[1];
-   bathymetry[0] = 0.0; displacement[0] = 0.0;
+	double bathymetry[1], displacement[1];
+	bathymetry[0] = 0.0; displacement[0] = 0.0;
 
-   easi::ArraysAdapter adapter;
-   adapter.addBindingPoint("b",bathymetry);
-   adapter.addBindingPoint("d",displacement);
+	easi::ArraysAdapter<double> adapter;
+	adapter.addBindingPoint("b",bathymetry);
+	adapter.addBindingPoint("d",displacement);
 
-  easi::Query query(1,3);
-  query.x(0,0)=x[0];
-  query.x(0,1)=x[1];
-  query.x(0,2)=0;
-  model->evaluate(query,adapter);
+	easi::Query query(1,3);
+	query.x(0,0)=x[0];
+	query.x(0,1)=x[1];
+	query.x(0,2)=0;
+	model->evaluate(query,adapter);
 
-  Q[0]=max(0.0,-bathymetry[0]); //h = H-b
-  if(std::isnan(Q[0]))
-    std::cout << "Error when reading bathymetry" << x[0] << "," << x[1] << std::endl;
-  Q[1]= 0;
-  Q[2]= 0;
-  Q[3]= displacement[0]+bathymetry[0]; 
+	Q[0]=max(0.0,-bathymetry[0]); //h = H-b
+	if(std::isnan(Q[0]))
+		std::cout << "Error when reading bathymetry" << x[0] << "," << x[1] << std::endl;
+	Q[1]= 0;
+	Q[2]= 0;
+	Q[3]= displacement[0]+bathymetry[0]; 
 }
 #endif
 
