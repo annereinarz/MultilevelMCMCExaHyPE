@@ -9,11 +9,11 @@ In ExaHyPE it is important to use the reinarz/muq branch and to switch Peano to 
 
 You must then run the toolkit (here it is assumed that ExaHyPE-Engine lies one folder above MultilevelMCMCExaHyPE, if not supply the correct path)
 
-  ../ExaHyPE-Engine/Toolkit/toolkit.sh SWE_MC_ADERDG.exahype2
+  ../ExaHyPE-Engine/Toolkit/toolkit.sh SWE_asagi_limited.exahype2
 
-Now move to the SWE_MC_ADERDG directory and call
+Now move to the SWE_asagi_limited directory and call
 
-  make -j4 link_muq
+  make -j98 link_muq
 
 to build the muq integration.
 
@@ -33,7 +33,7 @@ The applications can then be compiled using
 
 Running your binary requires the .exahype2 file to be passed:
 
-  mpirun -np 4 ./MLMCMC ../SWE_MC_ADERDG.exahype2
+  mpirun -np 4 ./MLMCMC ../SWE_asagi_limited.exahype2
 
 
 # Notes for SuperMUC
@@ -58,10 +58,10 @@ getting submodules via SSH:
 export COMPILER_CFLAGS=-DEXAHYPE_LATE_TAKEOVER
 export EXAHYPE_LATE_TAKEOVER
 
-In ApplicationExamples/SWE/SWE_MC_ADERDG_l.exahype2 set:
+In ApplicationExamples/SWE/SWE_asagi_limited.exahype2 set:
         "architecture": "skx",
 
-../../Toolkit/toolkit.sh SWE_MC_ADERDG_l.exahype2
+../../Toolkit/toolkit.sh SWE_asagi_limited.exahype2
 make -j40 link_muq
 
 #MUQ:
