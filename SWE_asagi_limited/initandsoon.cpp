@@ -243,7 +243,10 @@ namespace muq{
 		muq::subcommunicator_rank = globalcommunicator_rank_;
 
 		muq::param.resize(2);
-		int numProbes = 4;
+		muq::solution.resize(2);
+		muq::solution[0] = -1234.5;
+		muq::solution[1] = -1234.5;
+		int numProbes = 1;
 		muq::solution.resize(numProbes);
 		param=param_;  //store parameters
 
