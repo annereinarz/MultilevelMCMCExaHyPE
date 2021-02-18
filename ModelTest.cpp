@@ -36,8 +36,11 @@ int main(int argc, char** argv){
   auto index = localFactory->FinestIndex();
 
   do {
+    std::cout << "Testing model " << *index << std::endl;
+    std::cout << "============================================" << std::endl;
     auto problem = localFactory->SamplingProblem(index);
-    problem->LogDensity(std::make_shared<SamplingState>(localFactory->StartingPoint(index)));
+    double logdens = problem->LogDensity(std::make_shared<SamplingState>(localFactory->StartingPoint(index)));
+    std::cout << "LogDensity: " << logdens << std::endl;
     problem->QOI();
     index->SetValue(0, index->GetValue(0) - 1);
   } while (index->GetValue(0) > 0);
