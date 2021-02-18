@@ -35,6 +35,11 @@ target_link_libraries(FullParallelMLMCMC ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
 target_include_directories(FullParallelMLMCMC PRIVATE ${EXAHYPE_PATH})
 set_target_properties(FullParallelMLMCMC PROPERTIES LINK_FLAGS ${EXAHYPE_LINKS})
 
+add_executable(ModelTest ModelTest.cpp)
+target_link_libraries(ModelTest ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
+target_include_directories(ModelTest PRIVATE ${EXAHYPE_PATH})
+set_target_properties(ModelTest PROPERTIES LINK_FLAGS ${EXAHYPE_LINKS})
+
 #add_executable(MCMC_LOH1 MCMC_LOH1.cpp)
 #target_link_libraries(MCMC_LOH1 ${MUQ_LIBRARIES} ${MUQ_LINK_LIBRARIES})
 #target_include_directories(MCMC_LOH1 PRIVATE ${EXAHYPE_PATH})
