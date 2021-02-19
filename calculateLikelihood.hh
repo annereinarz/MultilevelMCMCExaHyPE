@@ -7,8 +7,23 @@
 //compare to "real" values
 //return number
 
-
 double calculateLikelihood(std::vector<double> solution, int rank){
+    int numProbes = 1;
+    double likelihood =  0.0;  //0.25*(ll[0] + ll[1] + ll[2] + ll[3]);
+
+    //calculate differences at the 4 different probe points
+    for(int i_probe=1; i_probe <= numProbes; i_probe++){
+        std::cout << "Difference in arrival time " << solution[0]-1.85232 << std::endl;
+        std::cout << "Difference in max height " << solution[1]-26.23200000001134  << std::endl;
+	likelihood -= 1.0/numProbes * .5 * (std::pow(solution[0]-26.23200000001134,2)/1.0+std::pow(solution[1]-1.85232,2)/0.01);
+    }
+    std::ofstream ost;
+    ost.open("likelihood_r"+std::to_string(rank)+".log", std::ios::app);
+    ost << std::exp(likelihood) << std::endl;
+    return likelihood;
+}
+
+double calculateLikelihood_endtime(std::vector<double> solution, int rank){
     int numProbes = 4;
     double likelihood =  0.0;  //0.25*(ll[0] + ll[1] + ll[2] + ll[3]);
 
