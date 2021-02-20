@@ -1,5 +1,6 @@
 #include "MUQ/Modeling/Distributions/Gaussian.h"
 #include "MUQ/Modeling/Distributions/Density.h"
+#include "MUQ/SamplingAlgorithms/AMProposal.h"
 #include "MUQ/SamplingAlgorithms/MHProposal.h"
 #include "MUQ/SamplingAlgorithms/CrankNicolsonProposal.h"
 #include "MUQ/SamplingAlgorithms/ParallelizableMIComponentFactory.h"
