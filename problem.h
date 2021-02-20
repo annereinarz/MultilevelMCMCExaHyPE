@@ -101,13 +101,18 @@ public:
 
     return std::make_shared<CrankNicolsonProposal>(pt, samplingProblem, prior);*/
 
-    auto mu = Eigen::VectorXd::Zero(NUM_PARAM);
+    pt.put("AdaptStart", 100);
+    pt.put("AdaptSteps", 100);
+    pt.put("InitialVariance", 0.5);
+    return std::make_shared<AMProposal>(pt, samplingProblem);
+
+    /*auto mu = Eigen::VectorXd::Zero(NUM_PARAM);
     Eigen::MatrixXd cov = Eigen::MatrixXd::Identity(NUM_PARAM, NUM_PARAM);
     cov *= 0.5;
 
     auto prior = std::make_shared<Gaussian>(mu, cov);
 
-    return std::make_shared<MHProposal>(pt, samplingProblem, prior);
+    return std::make_shared<MHProposal>(pt, samplingProblem, prior);*/
   }
 
   void SetComm(std::shared_ptr<parcer::Communicator> const& comm) override {
