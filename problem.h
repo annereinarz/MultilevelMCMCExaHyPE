@@ -148,8 +148,8 @@ public:
   virtual Eigen::VectorXd StartingPoint (std::shared_ptr<MultiIndex> const& index) override {
     //Starting guess: zero
     Eigen::VectorXd start = Eigen::VectorXd::Ones(NUM_PARAM);
-    start(0) = .6;
-    start(1) = .6;
+    start(0) = 10.0;
+    start(1) = 10.0;
     return start;
   }
 

@@ -34,7 +34,7 @@ int main(int argc, char** argv){
 
   pt::ptree pt;
 
-  pt.put("NumSamples", 100); // number of samples for single level
+  pt.put("NumSamples", 300); // number of samples for single level
   pt.put("NumInitialSamples", 3); //ignore// number of initial samples for greedy MLMCMC
   pt.put("GreedyTargetVariance", 0.05); //ignore// estimator variance to be achieved by greedy algorithm
   pt.put("verbosity", 1); // show some output
