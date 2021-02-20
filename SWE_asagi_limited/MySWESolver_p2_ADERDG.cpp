@@ -78,14 +78,15 @@ void SWE::MySWESolver_p2_ADERDG::adjustSolution(double* const luh, const tarch::
     }
     constexpr int order = MySWESolver_p2_ADERDG::Order;
     constexpr int numberOfUnknowns = MySWESolver_p2_ADERDG::NumberOfVariables;
-    std::vector<std::vector<double>> probe_point = { {0.2,0.2}, {0.4,0.2},
-						   {0.6,0.2}, {0.8,0.2}  };
+    std::vector<std::vector<double>> probe_point = {{ 545.735266126, 62.7164740303 }};
     for (int i = 0; i< probe_point.size(); i++){
 	  if( isInside_p2(probe_point[i], center, dx)){
-            muq::solution[i] = 0.0;
             double center_[DIMENSIONS] ={center[0],center[1]};
             double dx_[DIMENSIONS] ={dx[0],dx[1]};
-            muq::solution[i] = kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
+	    double cur_waterheight =  kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
+            if(cur_waterheight > 0.0002)
+		    muq::solution[0] = t; 
+            muq::solution[1] = std::max(muq::solution[1],cur_waterheight);
         }
     }
 }

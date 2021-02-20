@@ -8,6 +8,7 @@
 #include "reader/asagi_reader.h"
 #endif
 #include <cmath>
+#include "initandsoon_extern.h"
 
 using namespace std;
 using namespace SWE;
@@ -326,13 +327,21 @@ void InitialData::readAsagiData(const double* const x,double* Q){
 
 	easi::ArraysAdapter<double> adapter;
 	adapter.addBindingPoint("b",bathymetry);
-	adapter.addBindingPoint("d",displacement);
 
 	easi::Query query(1,3);
 	query.x(0,0)=x[0];
 	query.x(0,1)=x[1];
 	query.x(0,2)=0;
 	model->evaluate(query,adapter);
+	
+	easi::ArraysAdapter<double> adapter2;
+	adapter2.addBindingPoint("d",displacement);
+
+	easi::Query query2(1,3);
+	query2.x(0,0)=x[0] - muq::param[0];
+	query2.x(0,1)=x[1] - muq::param[1];
+	query2.x(0,2)=0;
+	model->evaluate(query2,adapter2);
 
 	Q[0]=max(0.0,-bathymetry[0]); //h = H-b
 	if(std::isnan(Q[0]))
@@ -394,11 +403,9 @@ void InitialData::getInitialData(const double* const x,double* Q) {
     case 13:
       SolitaryWaveOnSimpleBeach(x, Q);
           break;
-#if defined(USE_ASAGI)
     case 14:
 	  readAsagiData(x, Q);
           break;
-#endif
     default:
       GaussFunctionProblem(x, Q);
   }

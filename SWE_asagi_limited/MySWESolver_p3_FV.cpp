@@ -27,26 +27,28 @@ void SWE::MySWESolver_p3_FV::init(const std::vector<std::string>& cmdlineargs,co
 
 
 void SWE::MySWESolver_p3_FV::adjustSolution(const double* const x,const double t,const double dt, double* const Q) {
-  // Dimensions             = 2
-  // Number of variables    = 4 + #parameters
+	// Dimensions             = 2
+	// Number of variables    = 4 + #parameters
 
-  if (tarch::la::equals(t,0.0)) {
-    initialData->getInitialData(x, Q);
-  }
-  else{
-    if(Q[0] < epsilon_p3){
-      Q[1] = 0;
-      Q[2] = 0;      
-    }
-  }
-  constexpr int numberOfUnknowns = MySWESolver_p3_FV::NumberOfVariables;
-    std::vector<std::vector<double>> probe_point = { {0.2,0.2}, {0.4,0.2},
-						   {0.6,0.2}, {0.8,0.2}  };
-    for (int i = 0; i< probe_point.size(); i++){
-	  if( std::abs(probe_point[i][0] - x[0]) < 1e-4 && std::abs(probe_point[i][1] - x[1]) < 1e-4){
-            muq::solution[i] = Q[0];
-        }
-    }
+	if (tarch::la::equals(t,0.0)) {
+		initialData->getInitialData(x, Q);
+	}
+	else{
+		if(Q[0] < epsilon_p3){
+			Q[1] = 0;
+			Q[2] = 0;      
+		}
+	}
+	constexpr int numberOfUnknowns = MySWESolver_p3_FV::NumberOfVariables;
+	std::vector<std::vector<double>> probe_point = {{ 545.735266126, 62.7164740303 }};
+	for (int i = 0; i< probe_point.size(); i++){
+		if(std::abs(probe_point[i][0] - x[0]) < 1e-4 && std::abs(probe_point[i][1] - x[1]) < 1e-4){
+			double cur_waterheight =  Q[4];
+			if(cur_waterheight > 0.0002)
+				muq::solution[0] = t; 
+			muq::solution[1] = std::max(muq::solution[1],cur_waterheight);
+		}
+	}
 }
 
 void SWE::MySWESolver_p3_FV::eigenvalues(const double* const Q, const int dIndex, double* const lambda) {

@@ -47,7 +47,7 @@ public:
     }
 
     //Discard stupid parameters
-    if (param[0] >7.0 || param[0] < -0.0 || param[1]>7.0 || param[1]<-0.0){ //reject parameters outside domain
+    if (param[0] > 100.0 || param[0] < -100.0 || param[1]>100.0 || param[1]<-100.0){ //reject parameters outside domain
 	    std::ofstream ost;
 	    ost.open("likelihood_r"+std::to_string(globalComm->GetRank())+".log", std::ios::app);
 	    ost << std::exp(-24) << std::endl;
@@ -103,7 +103,7 @@ public:
 
     auto mu = Eigen::VectorXd::Zero(NUM_PARAM);
     Eigen::MatrixXd cov = Eigen::MatrixXd::Identity(NUM_PARAM, NUM_PARAM);
-    cov *= 0.005;
+    cov *= 0.5;
 
     auto prior = std::make_shared<Gaussian>(mu, cov);
 
