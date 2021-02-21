@@ -48,7 +48,7 @@ public:
     }
 
     //Discard stupid parameters
-    if (param[0] > 100.0 || param[0] < -100.0 || param[1]>100.0 || param[1]<-100.0){ //reject parameters outside domain
+    if (param[0] > 739.0 || param[0] < -239.0 || param[1]>339.0 || param[1]<-339.0){ //reject parameters outside domain
 	    std::ofstream ost;
 	    ost.open("likelihood_r"+std::to_string(globalComm->GetRank())+".log", std::ios::app);
 	    ost << std::exp(-24) << std::endl;
