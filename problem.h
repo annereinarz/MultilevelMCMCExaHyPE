@@ -64,7 +64,7 @@ public:
 
     comm->Barrier();
     double sigma = 1.0;
-    return calculateLikelihood(output,globalComm->GetRank());// - 0.5/(sigma*sigma)*state->state[0].squaredNorm();
+    return calculateLikelihood(output,globalComm->GetRank(), level);// - 0.5/(sigma*sigma)*state->state[0].squaredNorm();
   };
 
   virtual std::shared_ptr<SamplingState> QOI() override {

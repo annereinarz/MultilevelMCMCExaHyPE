@@ -7,9 +7,12 @@
 //compare to "real" values
 //return number
 
-double calculateLikelihood(std::vector<double> solution, int rank){
+double calculateLikelihood(std::vector<double> solution, int rank, int level){
     int numProbes = 1;
     double likelihood =  0.0;  //0.25*(ll[0] + ll[1] + ll[2] + ll[3]);
+
+    double likelihood_var_time[] = {7*7, 1.5*1.5, 0.75*0.75};
+    double likelihood_var_height[] = {1.5*1.5, 0.3*0.3, 0.25*0.25};
 
     //calculate differences at the 4 different probe points
     for(int i_probe=1; i_probe <= numProbes; i_probe++){
@@ -17,7 +20,7 @@ double calculateLikelihood(std::vector<double> solution, int rank){
         std::cout << "Max height " << solution[1]*1000.0 << std::endl;
         std::cout << "Difference in arrival time " << solution[0]/60.0-26.23200000001134  << std::endl;
         std::cout << "Arrival time " << solution[0]/60.0 << std::endl;
-	likelihood -= 1.0/numProbes * .5 * (std::pow(solution[0]/60.0-26.23200000001134,2)/1.0+std::pow(solution[1]*1000.0-1.85232,2)/0.01);
+    	likelihood -= 1.0/numProbes * .5 * (std::pow(solution[0]/60.0-26.23200000001134,2)/likelihood_var_time[level]+std::pow(solution[1]*1000.0-1.85232,2)/likelihood_var_height[level]);
     }
     std::ofstream ost;
     ost.open("likelihood_r"+std::to_string(rank)+".log", std::ios::app);
@@ -51,7 +54,7 @@ double calculateLikelihood_endtime(std::vector<double> solution, int rank){
                 double d3; ss >> d3;   // read 2
                 char cc3; ss >> cc3;   // read 1
                 double d4; ss >> d4;   // read 2
-                diff = d4; 
+                diff = d4;
         }
         }
 	std::cout << "Solution " << i_probe - 1 << " "  << solution[i_probe-1] << std::endl;
