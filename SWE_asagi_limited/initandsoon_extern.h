@@ -14,6 +14,7 @@
  * For the full license text, see LICENSE.txt
  **/
 #include <vector>
+#include "InitialData.h"
 
 namespace muq{
 
@@ -21,6 +22,8 @@ namespace muq{
     extern double mesh_width;
     extern std::vector<double> param;
     extern std::vector<double> solution;
+    extern InitialData* initialData_nobath;
+    extern InitialData* initialData;
 
     /*void gatherProbes(int numProbes){
 	    //Ensure that the solutions are distributed to all nodes

@@ -8,7 +8,7 @@ using namespace kernels;
 
 double grav;
 double epsilon;
-int scenario;
+bool arrived_fv = false;
 
 tarch::logging::Log SWE::MySWESolver_FV::_log( "SWE::MySWESolver_FV" );
 
@@ -19,9 +19,7 @@ void SWE::MySWESolver_FV::init(const std::vector<std::string>& cmdlineargs,const
     if (constants.isValueValidDouble( "epsilon" )) {
         epsilon = constants.getValueAsDouble( "epsilon" )/100.0;
     }
-    if (constants.isValueValidInt( "scenario" )) {
-      initialData= new InitialData(constants.getValueAsInt( "scenario" ));
-    }
+    arrived_fv = false;
 }
 
 
@@ -31,7 +29,7 @@ void SWE::MySWESolver_FV::adjustSolution(const double* const x,const double t,co
   // Number of variables    = 4 + #parameters
 
   if (tarch::la::equals(t,0.0)) {
-    initialData->getInitialData(x, Q);
+    muq::initialData_nobath->getInitialData(x, Q);
   }
   else{
     if(Q[0] < epsilon){
@@ -43,9 +41,12 @@ void SWE::MySWESolver_FV::adjustSolution(const double* const x,const double t,co
   std::vector<std::vector<double>> probe_point = {{ 545.735266126, 62.7164740303 }};
   for (int i = 0; i< probe_point.size(); i++){
 	  if(std::abs(probe_point[i][0] - x[0]) < 1e-4 && std::abs(probe_point[i][1] - x[1]) < 1e-4){
-		  double cur_waterheight =  Q[4];
-		  if(cur_waterheight > 0.0002)
-			  muq::solution[0] = t; 
+		  double cur_waterheight =  Q[3]+Q[0];
+		  if(cur_waterheight > 0.0002 && !arrived_fv){
+			  muq::solution[0] = t;
+		          arrived_fv = true; 
+			  std::cout << "arrival in fv at " << t << std::endl;
+		  }
 		  muq::solution[1] = std::max(muq::solution[1],cur_waterheight);
 	  }
   }
@@ -64,12 +65,8 @@ void SWE::MySWESolver_FV::eigenvalues(const double* const Q, const int dIndex, d
   eigs.h() = u_n + c;
   eigs.hu() = u_n - c;
   eigs.hv() = u_n;
-  eigs.b() = 0.0;
-
-  if(tarch::la::equals(u_n,0.0) && tarch::la::equals(c,0.0)){
-    eigs.h() = std::sqrt(grav * epsilon);
-  }
-
+  eigs.b() = std::sqrt(grav * epsilon);
+ 
 }
 
 void SWE::MySWESolver_FV::boundaryValues(

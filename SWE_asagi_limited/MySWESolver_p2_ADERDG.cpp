@@ -19,7 +19,7 @@ using namespace kernels;
 
 double grav_DG_p2;
 double epsilon_DG_p2;
-int scenario_DG_p2;
+bool arrived_p2;
 
 tarch::logging::Log SWE::MySWESolver_p2_ADERDG::_log( "SWE::MySWESolver_p2_ADERDG" );
 
@@ -32,11 +32,7 @@ void SWE::MySWESolver_p2_ADERDG::init(const std::vector<std::string>& cmdlinearg
     epsilon_DG_p2 = constants.getValueAsDouble( "epsilon" )*1.0e-3;
     std::cout << "Epsilon " << epsilon_DG_p2 << std::endl;
   }
-  if (constants.isValueValidInt( "scenario" )) {
-    initialData= new InitialData(constants.getValueAsInt( "scenario" ));
-    std::cout << "Scenario " << constants.getValueAsInt("scenario") << std::endl;
-  }
-
+  arrived_p2 = false;
 }
 
 // Utilitiy function used by all solvers
@@ -72,7 +68,7 @@ void SWE::MySWESolver_p2_ADERDG::adjustSolution(double* const luh, const tarch::
                                 (offset_y+dx[1]*kernels::legendre::nodes[basisSize-1][j])
 			      };
 
-		initialData->getInitialData(x, luh+id_xyf(i,j,0));		
+		muq::initialData->getInitialData(x, luh+id_xyf(i,j,0));		
             }
         }
     }
@@ -83,9 +79,11 @@ void SWE::MySWESolver_p2_ADERDG::adjustSolution(double* const luh, const tarch::
 	  if( isInside_p2(probe_point[i], center, dx)){
             double center_[DIMENSIONS] ={center[0],center[1]};
             double dx_[DIMENSIONS] ={dx[0],dx[1]};
-	    double cur_waterheight =  kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
-            if(cur_waterheight > 0.0002)
+	    double cur_waterheight =   kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 3, order, luh) + kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
+            if(cur_waterheight > 0.0002 && !arrived_p2){
 		    muq::solution[0] = t; 
+		    arrived_p2 = true;
+	    }
             muq::solution[1] = std::max(muq::solution[1],cur_waterheight);
         }
     }

@@ -50,6 +50,8 @@ namespace muq{
 	double mesh_width = 0.0;
 	std::vector<double> param = {0.6,0.6};
 	std::vector<double> solution = {};
+	InitialData* initialData_nobath = new InitialData(15);
+	InitialData* initialData = new InitialData(14);
 
 	int finalize(){
 		kernels::finalise();
@@ -247,12 +249,12 @@ namespace muq{
 		muq::solution[0] = -1234.5;
 		muq::solution[1] = -1234.5;
 		int numProbes = 1;
-		muq::solution.resize(numProbes);
 		param=param_;  //store parameters
-
+		initialData_nobath = new InitialData(15);
+		initialData = new InitialData(14);
 		exahype::runners::Runner runner(parser, cmdlineargs);
 		int programExitCode = runner.run(0);
-
+		std::cout << "solution time "  << muq::solution[0] << " height " << muq::solution[1] << std::endl;
 		if (programExitCode == 0) {
 #ifdef Parallel
 			if (tarch::parallel::Node::getInstance().isGlobalMaster()) {
@@ -264,7 +266,8 @@ namespace muq{
 		} else {
 			logInfo("main()", "quit with error code " << programExitCode);
 		}
-
+		delete initialData_nobath;
+		delete initialData;
 		return solution;
 	}
 

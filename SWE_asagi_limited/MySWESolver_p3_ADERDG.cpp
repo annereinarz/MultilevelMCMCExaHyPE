@@ -7,18 +7,19 @@
 // ========================
 
 #include "MySWESolver_p3_ADERDG.h"
-#include "InitialData.h"
 #include "MySWESolver_p3_ADERDG_Variables.h"
 
 #include "peano/utils/Loop.h"
 #include "kernels/KernelUtils.h"
 #include "../../../ExaHyPE/kernels/GaussLegendreBasis.h"
 #include "initandsoon_extern.h"
+#include "InitialData.h"
 
 using namespace kernels;
 
 double grav_DG_p3;
 double epsilon_DG_p3;
+bool arrived_p3;
 
 tarch::logging::Log SWE::MySWESolver_p3_ADERDG::_log( "SWE::MySWESolver_p3_ADERDG" );
 
@@ -31,11 +32,7 @@ void SWE::MySWESolver_p3_ADERDG::init(const std::vector<std::string>& cmdlinearg
     epsilon_DG_p3 = constants.getValueAsDouble( "epsilon" )*1.0e-3;
     std::cout << "Epsilon " << epsilon_DG_p3 << std::endl;
   }
-  if (constants.isValueValidInt( "scenario" )) {
-    initialData= new InitialData(constants.getValueAsInt( "scenario" ));
-    std::cout << "Scenario " << constants.getValueAsInt("scenario") << std::endl;
-  }
-
+  arrived_p3 = false;
 }
 
 // Utilitiy function used by all solvers
@@ -71,7 +68,7 @@ void SWE::MySWESolver_p3_ADERDG::adjustSolution(double* const luh, const tarch::
                                 (offset_y+dx[1]*kernels::legendre::nodes[basisSize-1][j])
 			      };
 
-		initialData->getInitialData(x, luh+id_xyf(i,j,0));		
+		(muq::initialData)->getInitialData(x, luh+id_xyf(i,j,0));		
             }
         }
     }
@@ -82,9 +79,11 @@ void SWE::MySWESolver_p3_ADERDG::adjustSolution(double* const luh, const tarch::
 	  if( isInside_p3(probe_point[i], center, dx)){
             double center_[DIMENSIONS] ={center[0],center[1]};
             double dx_[DIMENSIONS] ={dx[0],dx[1]};
-	    double cur_waterheight =  kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
-            if(cur_waterheight > 0.0002)
+	    double cur_waterheight = kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 3, order, luh) + kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
+            if(cur_waterheight > 0.0002 && !arrived_p3){
+		    arrived_p3 = true;
 		    muq::solution[0] = t; 
+	    }
             muq::solution[1] = std::max(muq::solution[1],cur_waterheight);
         }
     }

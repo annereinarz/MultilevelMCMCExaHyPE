@@ -7,22 +7,21 @@
 // ========================
 
 #include "MySWESolver_ADERDG.h"
-#include "InitialData.h"
 #include "MySWESolver_ADERDG_Variables.h"
 
 #include "peano/utils/Loop.h"
 #include "kernels/KernelUtils.h"
 #include "../../../ExaHyPE/kernels/GaussLegendreBasis.h"
 #include "initandsoon_extern.h"
+#include "InitialData.h"
 
 using namespace kernels;
 
 double grav_DG;
 double epsilon_DG;
-int scenario_DG;
 
 tarch::logging::Log SWE::MySWESolver_ADERDG::_log( "SWE::MySWESolver_ADERDG" );
-
+bool arrived = false;
 
 void SWE::MySWESolver_ADERDG::init(const std::vector<std::string>& cmdlineargs,const exahype::parser::ParserView& constants) {
   if (constants.isValueValidDouble( "grav" )) {
@@ -32,10 +31,7 @@ void SWE::MySWESolver_ADERDG::init(const std::vector<std::string>& cmdlineargs,c
     epsilon_DG = constants.getValueAsDouble( "epsilon" )*1.0e-3;
     std::cout << "Epsilon " << epsilon_DG << std::endl;
   }
-  if (constants.isValueValidInt( "scenario" )) {
-    initialData= new InitialData(constants.getValueAsInt( "scenario" ));
-    std::cout << "Scenario " << constants.getValueAsInt("scenario") << std::endl;
-  }
+  arrived = false;
 
 }
 
@@ -52,7 +48,9 @@ void SWE::MySWESolver_ADERDG::adjustSolution(double* const luh, const tarch::la:
   // Dimensions                        = 2
   // Number of variables + parameters  = 4 + 0
     if (tarch::la::equals(t,0.0)) {
-
+ 
+	static tarch::multicore::BooleanSemaphore initializationSemaphoreDG;
+	tarch::multicore::Lock lock(initializationSemaphoreDG);
 
         constexpr int basisSize = MySWESolver_ADERDG::Order+1;
         constexpr int numberOfData=MySWESolver_ADERDG::NumberOfParameters+MySWESolver_ADERDG::NumberOfVariables;
@@ -72,9 +70,10 @@ void SWE::MySWESolver_ADERDG::adjustSolution(double* const luh, const tarch::la:
                                 (offset_y+dx[1]*kernels::legendre::nodes[basisSize-1][j])
 			      };
 
-		initialData->getInitialData(x, luh+id_xyf(i,j,0));		
+		muq::initialData_nobath->getInitialData(x, luh+id_xyf(i,j,0));		
             }
         }
+	lock.free();
     }
     constexpr int order = MySWESolver_ADERDG::Order;
     constexpr int numberOfUnknowns = MySWESolver_ADERDG::NumberOfVariables;
@@ -83,9 +82,11 @@ void SWE::MySWESolver_ADERDG::adjustSolution(double* const luh, const tarch::la:
 	  if( isInside(probe_point[i], center, dx)){
             double center_[DIMENSIONS] ={center[0],center[1]};
             double dx_[DIMENSIONS] ={dx[0],dx[1]};
-	    double cur_waterheight =  kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
-            if(cur_waterheight > 0.0002)
+	    double cur_waterheight =   kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 3, order, luh) + kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
+            if(cur_waterheight > 0.0002 && !arrived){
 		    muq::solution[0] = t; 
+		    arrived = true;
+	    }
             muq::solution[1] = std::max(muq::solution[1],cur_waterheight);
         }
     }

@@ -28,7 +28,6 @@ namespace SWE{
 
 class SWE::MySWESolver_FV : public SWE::AbstractMySWESolver_FV {
   private:
-  InitialData* initialData;
 
     /**
      * Log device

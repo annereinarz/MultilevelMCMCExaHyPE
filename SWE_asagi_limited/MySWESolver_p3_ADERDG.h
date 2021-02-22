@@ -27,7 +27,6 @@ namespace SWE{
 
 class SWE::MySWESolver_p3_ADERDG : public SWE::AbstractMySWESolver_p3_ADERDG {
   private:
-  InitialData* initialData;
     /**
      * Log device
      */
