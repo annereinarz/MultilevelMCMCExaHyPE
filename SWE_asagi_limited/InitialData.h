@@ -12,6 +12,7 @@ class AsagiReader;
 class InitialData {
  public:
   InitialData();
+  ~InitialData();
   InitialData(int scenario);  
   void getInitialData(const double* const x,double* Q);
   
@@ -38,6 +39,7 @@ class InitialData {
   void OscillatingLake(const double* const x, double* Q);
   void SolitaryWaveOnSimpleBeach(const double*const x, double* Q);
   void readAsagiData(const double* const x,double* Q);
+  void readAsagiData_nobath(const double* const x,double* Q);
 };
 
 #endif // __InitialData_CLASS_HEADER__

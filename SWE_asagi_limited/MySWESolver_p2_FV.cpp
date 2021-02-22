@@ -2,7 +2,7 @@
 #include "MySWESolver_p2_FV_Variables.h"
 
 #include "kernels/KernelUtils.h"
-#include "initandsoon_extern.h"
+#include "muq_globals.h"
 
 using namespace kernels;
 

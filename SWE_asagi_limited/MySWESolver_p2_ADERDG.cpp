@@ -13,7 +13,7 @@
 #include "peano/utils/Loop.h"
 #include "kernels/KernelUtils.h"
 #include "../../../ExaHyPE/kernels/GaussLegendreBasis.h"
-#include "initandsoon_extern.h"
+#include "muq_globals.h"
 
 using namespace kernels;
 

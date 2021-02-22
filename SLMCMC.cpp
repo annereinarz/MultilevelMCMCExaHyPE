@@ -8,7 +8,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include <initandsoon.h>
+#include <initialiseMUQ.h>
 
 #include "calculateLikelihood.hh"
 
@@ -34,11 +34,11 @@ int main(int argc, char** argv){
 
   pt::ptree pt;
 
-  pt.put("NumSamples", 300); // number of samples for single level
+  pt.put("NumSamples", 10000); // number of samples for single level
   pt.put("NumInitialSamples", 3); //ignore// number of initial samples for greedy MLMCMC
   pt.put("GreedyTargetVariance", 0.05); //ignore// estimator variance to be achieved by greedy algorithm
   pt.put("verbosity", 1); // show some output
-  pt.put("BurnIn", 10);
+  pt.put("BurnIn", 300);
   pt.put("NumSamples_0", 1e2);
   pt.put("NumSamples_1", 5e1);
 

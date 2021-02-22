@@ -25,7 +25,7 @@
 #include "exahype/Vertex.h"
 #include "exahype/runners/Runner.h"
 
-#include "initandsoon_extern.h"
+#include "muq_globals.h"
 #include "kernels/KernelCalls.h"
 
 #include "kernels/GaussLegendreBasis.h"
