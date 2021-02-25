@@ -8,22 +8,28 @@
 //return number
 
 double calculateLikelihood(std::vector<double> solution, int rank, int level){
-    int numProbes = 1;
-    double likelihood =  0.0;  //0.25*(ll[0] + ll[1] + ll[2] + ll[3]);
+    int numProbes = 2;
+    double likelihood =  0.0;
 
     double likelihood_var_time[] = {7*7, 1.5*1.5, 0.75*0.75};
     double likelihood_var_height[] = {1.5*1.5, 0.3*0.3, 0.25*0.25};
 
+    double probe_max_height[] = {1.85232, 0.6368};
+    double probe_max_time[] = {30.23, 87.98};
+    
     //calculate differences at the 4 different probe points
-    for(int i_probe=1; i_probe <= numProbes; i_probe++){
-        std::cout << "Difference in max height " << solution[1]*1000.0-1.85232 << std::endl;
-        std::cout << "Max height " << solution[1]*1000.0 << std::endl;
-        std::cout << "Difference in arrival time " << solution[0]/60.0-26.23200000001134  << std::endl;
-        std::cout << "Arrival time " << solution[0]/60.0 << std::endl;
-    	likelihood -= 1.0/numProbes * .5 * (std::pow(solution[0]/60.0-26.23200000001134,2)/likelihood_var_time[level]+std::pow(solution[1]*1000.0-1.85232,2)/likelihood_var_height[level]);
+    for(int i_probe=0; i_probe < numProbes; i_probe++){
+        double diff_height =  solution[1+2*i_probe]*1000.0 - probe_max_height[i_probe];
+        std::cout << "Max height diff " << diff_height << std::endl;
+        std::cout << "height  " <<  solution[1+2*i_probe]*1000.0 << std::endl;
+        double diff_time = solution[0+2*i_probe]/60.0 - probe_max_time[i_probe];
+        std::cout << "Arrival time diff " << diff_time  << std::endl;
+    	likelihood -= 1.0/numProbes * .5 * (std::pow(diff_time,2)/likelihood_var_time[level]+
+			std::pow(diff_height,2)/likelihood_var_height[level]);
     }
     std::ofstream ost;
     ost.open("likelihood_r"+std::to_string(rank)+".log", std::ios::app);
+    std::cout << "Likelihood " << likelihood << std::endl;
     ost << std::exp(likelihood) << std::endl;
     return likelihood;
 }
