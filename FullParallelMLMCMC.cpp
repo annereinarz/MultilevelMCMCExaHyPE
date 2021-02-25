@@ -40,8 +40,8 @@ class MyStaticLoadBalancer : public StaticLoadBalancer {
       }
       WorkerAssignment numWorkers(std::shared_ptr<MultiIndex> modelIndex) override {
         WorkerAssignment assignment;
-        assignment.numWorkersPerGroup = 4;
-        assignment.numGroups = (ranks_remaining / models_remaining) / 4;
+        assignment.numWorkersPerGroup = 1;
+        assignment.numGroups = (ranks_remaining / models_remaining) / assignment.numWorkersPerGroup;
 
         spdlog::debug("Of {}, assigning {} to model {}", ranks_remaining, assignment.numGroups * assignment.numWorkersPerGroup, *modelIndex);
 
@@ -81,13 +81,10 @@ int main(int argc, char** argv){
 
   pt::ptree pt;
 
-  pt.put("NumSamples", 100); // number of samples for single level
-  pt.put("NumInitialSamples", 3); //ignore// number of initial samples for greedy MLMCMC
-  pt.put("GreedyTargetVariance", 0.05); //ignore// estimator variance to be achieved by greedy algorithm
   pt.put("verbosity", 1); // show some output
   pt.put("MCMC.BurnIn", 10);
-  pt.put("NumSamples_0", 1e2);
-  pt.put("NumSamples_1", 5e1);
+  pt.put("NumSamples_0", 650);
+  //pt.put("NumSamples_1", 5e1);
   pt.put("MLMCMC.Scheduling", true);
   pt.put("MLMCMC.Subsampling", 10);
 
@@ -98,8 +95,6 @@ int main(int argc, char** argv){
     Eigen::VectorXd meanQOI = parallelMIMCMC.MeanQOI();
     std::cout << "mean QOI: " << meanQOI.transpose() << std::endl;
   }
-  parallelMIMCMC.WriteToFile("parallelMIMCMC.h5");
-  parallelMIMCMC.Finalize();
 
   comm->Barrier();
   if (comm->GetRank() == 0)
@@ -107,6 +102,7 @@ int main(int argc, char** argv){
   comm->Barrier();
 
   parallelMIMCMC.WriteToFile("FullParallelMLMCMC.hdf5");
+  parallelMIMCMC.Finalize();
 
 
 }

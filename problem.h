@@ -122,7 +122,7 @@ public:
 
   virtual std::shared_ptr<MultiIndex> FinestIndex() override {
     auto index = std::make_shared<MultiIndex>(1);
-    index->SetValue(0, 1);
+    index->SetValue(0, 0);
     return index;
   }
 
