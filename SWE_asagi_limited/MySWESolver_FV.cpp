@@ -2,13 +2,12 @@
 #include "MySWESolver_FV_Variables.h"
 
 #include "kernels/KernelUtils.h"
-#include "initandsoon_extern.h"
+#include "muq_globals.h"
 
 using namespace kernels;
 
 double grav;
 double epsilon;
-bool arrived_fv = false;
 
 tarch::logging::Log SWE::MySWESolver_FV::_log( "SWE::MySWESolver_FV" );
 
@@ -19,7 +18,6 @@ void SWE::MySWESolver_FV::init(const std::vector<std::string>& cmdlineargs,const
     if (constants.isValueValidDouble( "epsilon" )) {
         epsilon = constants.getValueAsDouble( "epsilon" )/100.0;
     }
-    arrived_fv = false;
 }
 
 
@@ -36,19 +34,6 @@ void SWE::MySWESolver_FV::adjustSolution(const double* const x,const double t,co
       Q[1] = 0;
       Q[2] = 0;      
     }
-  }
-  constexpr int numberOfUnknowns = MySWESolver_FV::NumberOfVariables;
-  std::vector<std::vector<double>> probe_point = {{ 545.735266126, 62.7164740303 }};
-  for (int i = 0; i< probe_point.size(); i++){
-	  if(std::abs(probe_point[i][0] - x[0]) < 1e-4 && std::abs(probe_point[i][1] - x[1]) < 1e-4){
-		  double cur_waterheight =  Q[3]+Q[0];
-		  if(cur_waterheight > 0.0002 && !arrived_fv){
-			  muq::solution[0] = t;
-		          arrived_fv = true; 
-			  std::cout << "arrival in fv at " << t << std::endl;
-		  }
-		  muq::solution[1] = std::max(muq::solution[1],cur_waterheight);
-	  }
   }
 }
 

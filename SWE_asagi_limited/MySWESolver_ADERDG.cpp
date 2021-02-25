@@ -21,7 +21,6 @@ double grav_DG;
 double epsilon_DG;
 
 tarch::logging::Log SWE::MySWESolver_ADERDG::_log( "SWE::MySWESolver_ADERDG" );
-bool arrived = false;
 
 void SWE::MySWESolver_ADERDG::init(const std::vector<std::string>& cmdlineargs,const exahype::parser::ParserView& constants) {
   if (constants.isValueValidDouble( "grav" )) {
@@ -31,8 +30,6 @@ void SWE::MySWESolver_ADERDG::init(const std::vector<std::string>& cmdlineargs,c
     epsilon_DG = constants.getValueAsDouble( "epsilon" )*1.0e-3;
     std::cout << "Epsilon " << epsilon_DG << std::endl;
   }
-  arrived = false;
-
 }
 
 // Utilitiy function used by all solvers
@@ -74,21 +71,6 @@ void SWE::MySWESolver_ADERDG::adjustSolution(double* const luh, const tarch::la:
             }
         }
 	lock.free();
-    }
-    constexpr int order = MySWESolver_ADERDG::Order;
-    constexpr int numberOfUnknowns = MySWESolver_ADERDG::NumberOfVariables;
-    std::vector<std::vector<double>> probe_point = {{ 545.735266126, 62.7164740303 }};
-    for (int i = 0; i< probe_point.size(); i++){
-	  if( isInside(probe_point[i], center, dx)){
-            double center_[DIMENSIONS] ={center[0],center[1]};
-            double dx_[DIMENSIONS] ={dx[0],dx[1]};
-	    double cur_waterheight =   kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 3, order, luh) + kernels::legendre::interpolate( center_, dx_, &(probe_point[i][0]), numberOfUnknowns, 0, order, luh);
-            if(cur_waterheight > 0.0002 && !arrived){
-		    muq::solution[0] = t; 
-		    arrived = true;
-	    }
-            muq::solution[1] = std::max(muq::solution[1],cur_waterheight);
-        }
     }
 }
 
