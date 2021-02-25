@@ -40,7 +40,7 @@ class MyStaticLoadBalancer : public StaticLoadBalancer {
       }
       WorkerAssignment numWorkers(std::shared_ptr<MultiIndex> modelIndex) override {
         WorkerAssignment assignment;
-        assignment.numWorkersPerGroup = 2;
+        assignment.numWorkersPerGroup = 1;
         assignment.numGroups = (ranks_remaining / models_remaining) / assignment.numWorkersPerGroup;
 
         spdlog::debug("Of {}, assigning {} to model {}", ranks_remaining, assignment.numGroups * assignment.numWorkersPerGroup, *modelIndex);

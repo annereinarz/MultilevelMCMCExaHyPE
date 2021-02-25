@@ -13,8 +13,8 @@
 # # #SBATCH -D ./
 
 #Notification and type
-#SBATCH --mail-type=END
-#SBATCH --mail-user=reinarz@in.tum.de
+##SBATCH --mail-type=END
+##SBATCH --mail-user=reinarz@in.tum.de
 
 # Wall clock limit:
 #SBATCH --time=00:10:00
@@ -32,6 +32,8 @@ export OMP_NUM_THREADS=48 # Ensures we actually get all cores (thanks, SLURM)
 module load tbb
 module load python/3.6_intel
 module load cmake/3.10
+module load gsl/2.3-intel
+module load hdf5/1.8.20-intel-impi-frt-threadsafe
 
 # run the application
 rm parameters_r*.log

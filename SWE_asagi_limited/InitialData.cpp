@@ -20,7 +20,7 @@ extern int scenario;
 #ifdef Dim2
 
 InitialData::InitialData()
-	: scenario(1){
+	: scenario(){
 #if defined(USE_ASAGI)
 		std::cout << "Initialising with ASAGI" << std::endl;
 		static tarch::multicore::BooleanSemaphore initializationSemaphoreDG;
@@ -33,7 +33,7 @@ InitialData::InitialData()
 #endif
 	}
 
-InitialData::InitialData(int a_scenario)
+InitialData::InitialData(int a_scenario, char* filename)
 	: scenario(a_scenario){
 #if defined(USE_ASAGI)
 		std::cout << "Initialising with ASAGI" << std::endl;
@@ -41,7 +41,7 @@ InitialData::InitialData(int a_scenario)
 		tarch::multicore::Lock lock(initializationSemaphoreDG);
 		asagiReader = new AsagiReader("");
 		parser = new easi::YAMLParser(3, asagiReader);
-		model  = parser->parse("data.yaml");
+		model  = parser->parse(filename);
 		//Easi binding point for topography
 		lock.free();
 #endif

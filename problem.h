@@ -61,6 +61,7 @@ public:
     //muq::setCommunicator(comm->GetMPICommunicator());
     //muq::init(saved_argc,saved_argv);
     auto output = muq::run_exahype(param,globalComm->GetRank(), level);
+    //std::cout << "run_exahype has solution " << output[0] << " and " << output[1]  << std::endl;
 
     comm->Barrier();
     double sigma = 1.0;

@@ -9,14 +9,14 @@
   "architecture": "skx",
   "computational_domain": {
     "dimension": 2,
-    "end_time": 2400.0,
+    "end_time": 5400.0,
     "offset": [
       -499.0,
-      -749.0
+      -949.0
     ],
     "width": [
-      1498.0,
-      1498.0
+      1798.0,
+      1798.0
     ]
   },
   "shared_memory": {
@@ -26,7 +26,7 @@
     "background_job_consumers": 23
   },
   "distributed_memory": {
-    "timeout": 6000000,
+    "timeout": 6,
     "load_balancing_type": "static",
     "buffer_size": 1600,
     "load_balancing_strategy": "hotspot",
@@ -49,10 +49,10 @@
     {
       "type": "Limiting-ADER-DG",
       "name": "MySWESolver",
-      "order": 1,
-      "maximum_mesh_size": 10,
+      "order": 2,
+      "maximum_mesh_size": 80,
       "maximum_mesh_depth": 0,
-      "time_stepping": "global",
+      "time_stepping": "globalfixed",
       "aderdg_kernel": {
         "language": "C",
         "nonlinear": true,
@@ -63,13 +63,13 @@
         "space_time_predictor": {},
         "optimised_terms": [],
         "optimised_kernel_debugging": [],
-        "implementation": "generic",
+        "implementation": "optimised",
 	"adjust_solution": "patchwise",
 	"allocate_temporary_arrays": "stack"
       },
       "point_sources": 0,
       "limiter": {
-        "dmp_observables": 4,
+        "dmp_observables": 0,
         "dmp_relaxation_parameter": 100000000.0,
         "dmp_difference_scaling": 100000000.0,
         "implementation": "generic"
@@ -77,8 +77,7 @@
       "fv_kernel": {
         "language": "C",
         "terms": [
-          "flux",
-          "ncp"
+          "flux"
         ],
         "scheme": "godunov",
         "implementation": "generic",
@@ -105,36 +104,40 @@
       "parameters": {
         "grav": 9.81,
         "epsilon": 10.0,
-        "scenario": 14
+        "scenario": 15
       },
       "plotters": [
-        {
-          "type": "vtu::Cartesian::cells::limited::ascii",
-          "name": "ConservedWriter",
-          "time": 0.0,
-          "repeat": 0.001,
-          "output": "./tohoku_output_aderdg/conserved",
-          "variables": 5
-        },
-        {
+      {
           "type": "probe::ascii",
-          "name": "ProbeWriter",
+          "name": "ProbeWriter18",
           "time": 0.0,
           "repeat": 10.0,
-          "output": "./buoy",
+          "output": "./buoy18",
           "variables": 5,
           "select": {
             "x": 545.735266126,
             "y": 62.7164740303
           }
-        }
+      },
+      {
+          "type": "probe::ascii",
+          "name": "ProbeWriter19",
+          "time": 0.0,
+          "repeat": 10.0,
+          "output": "./buoy19",
+          "variables": 5,
+          "select": {
+            "x": 1050.67821,
+            "y": 798.352124
+	  }
+      }
       ]
     },
     {
       "type": "Limiting-ADER-DG",
       "name": "MySWESolver_p2",
       "order": 2,
-      "maximum_mesh_size": 10,
+      "maximum_mesh_size": 30,
       "maximum_mesh_depth": 0,
       "time_stepping": "global",
       "aderdg_kernel": {
@@ -147,13 +150,13 @@
         "space_time_predictor": {},
         "optimised_terms": [],
         "optimised_kernel_debugging": [],
-        "implementation": "generic",
+        "implementation": "optimised",
 	"adjust_solution": "patchwise",
 	"allocate_temporary_arrays": "stack"
       },
       "point_sources": 0,
       "limiter": {
-        "dmp_observables": 4,
+        "dmp_observables": 0,
         "dmp_relaxation_parameter": 100000000.0,
         "dmp_difference_scaling": 100000000.0,
         "implementation": "generic"
@@ -194,10 +197,10 @@
       "plotters": [
         {
           "type": "probe::ascii",
-          "name": "ProbeWriter_p2",
+          "name": "ProbeWriter_p2_18",
           "time": 0.0,
           "repeat": 10.0,
-          "output": "./buoy-p2",
+          "output": "./buoy-p2-18",
           "variables": 5,
           "select": {
             "x": 545.735266126,
@@ -210,7 +213,7 @@
       "type": "Limiting-ADER-DG",
       "name": "MySWESolver_p3",
       "order": 3,
-      "maximum_mesh_size": 10,
+      "maximum_mesh_size": 30,
       "maximum_mesh_depth": 0,
       "time_stepping": "global",
       "aderdg_kernel": {
@@ -223,7 +226,7 @@
         "space_time_predictor": {},
         "optimised_terms": [],
         "optimised_kernel_debugging": [],
-        "implementation": "generic",
+        "implementation": "optimised",
 	"adjust_solution": "patchwise",
 	"allocate_temporary_arrays": "stack"
       },
@@ -269,19 +272,11 @@
       },
       "plotters": [
         {
-          "type": "vtu::Cartesian::cells::limited::ascii",
-          "name": "ConservedWriter_p3",
-          "time": 0.0,
-          "repeat": 0.1,
-          "output": "./tohoku_output_aderdg/conserved-p3",
-          "variables": 5
-        },
-        {
           "type": "probe::ascii",
-          "name": "ProbeWriter_p3",
+          "name": "ProbeWriter_p3_18",
           "time": 0.0,
           "repeat": 10.0,
-          "output": "./buoy-p3",
+          "output": "./buoy-p3-18",
           "variables": 5,
           "select": {
             "x": 545.735266126,

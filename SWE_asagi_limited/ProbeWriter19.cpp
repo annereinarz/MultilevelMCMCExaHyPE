@@ -45,7 +45,6 @@ void SWE::ProbeWriter19::mapQuantities(
   if(outputQuantities[4] > muq::solution[1+2*1]){
 	  muq::solution[0+2*1] = timeStamp; 
 	  muq::solution[1+2*1] = outputQuantities[4];
-	  std::cout <<"Probe" << 1 << " has time " << muq::solution[0+2*1]/60 << " and height " << muq::solution[1+2*1]*1000 << std::endl;
+	  //std::cout <<"Probe" << 1 << " has time " << muq::solution[0+2*1]/60 << " and height " << muq::solution[1+2*1]*1000 << std::endl;
   }
-
 }

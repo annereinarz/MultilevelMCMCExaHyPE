@@ -12,8 +12,8 @@ class AsagiReader;
 class InitialData {
  public:
   InitialData();
+  InitialData(int scenario, char* filename);  
   ~InitialData();
-  InitialData(int scenario);  
   void getInitialData(const double* const x,double* Q);
   
  private:

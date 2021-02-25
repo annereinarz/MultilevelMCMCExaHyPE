@@ -50,10 +50,12 @@ namespace muq{
 	double mesh_width = 0.0;
 	std::vector<double> param = {0.6,0.6};
 	std::vector<double> solution = {};
-	InitialData* initialData_nobath = new InitialData(15);
-	InitialData* initialData = new InitialData(14);
+	InitialData* initialData_nobath = new InitialData(14,"data_gmt.yaml");
+	InitialData* initialData = new InitialData(14,"data.yaml");
 
 	int finalize(){
+		delete initialData_nobath;
+		delete initialData;
 		kernels::finalise();
 		peano::releaseCachedData();
 		peano::shutdownParallelEnvironment();
@@ -241,20 +243,15 @@ namespace muq{
 	}
 
 	std::vector<double> run_exahype(std::vector<double> param_, int globalcommunicator_rank_, int level=0){
-		std::cout << "Global rank " << globalcommunicator_rank_ << std::endl;
 		muq::subcommunicator_rank = globalcommunicator_rank_;
 
 		muq::param.resize(2);
-		muq::solution.resize(2);
-		muq::solution[0] = -1234.5;
-		muq::solution[1] = -1234.5;
-		int numProbes = 1;
+		muq::solution.resize(4);
+		for(int i=0; i<muq::solution.size();i++)
+			muq::solution[i] = -1234.5;
 		param=param_;  //store parameters
-		initialData_nobath = new InitialData(15);
-		initialData = new InitialData(14);
 		exahype::runners::Runner runner(parser, cmdlineargs);
-		int programExitCode = runner.run(0);
-		std::cout << "solution time "  << muq::solution[0] << " height " << muq::solution[1] << std::endl;
+		int programExitCode = runner.run(level);
 		if (programExitCode == 0) {
 #ifdef Parallel
 			if (tarch::parallel::Node::getInstance().isGlobalMaster()) {
@@ -266,8 +263,6 @@ namespace muq{
 		} else {
 			logInfo("main()", "quit with error code " << programExitCode);
 		}
-		delete initialData_nobath;
-		delete initialData;
 		return solution;
 	}
 
