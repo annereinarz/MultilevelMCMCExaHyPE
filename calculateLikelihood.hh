@@ -11,8 +11,8 @@ double calculateLikelihood(std::vector<double> solution, int rank, int level){
     int numProbes = 2;
     double likelihood =  0.0;
 
-    double likelihood_var_time[] = {7*7, 1.5*1.5, 0.75*0.75};
-    double likelihood_var_height[] = {1.5*1.5, 0.3*0.3, 0.25*0.25};
+    double likelihood_var_time[] = {2.5*2.5, 1.5*1.5, 0.75*0.75};
+    double likelihood_var_height[] = {0.15*0.15, 0.1*0.1, 0.1*0.1};
 
     double probe_max_height[] = {1.85232, 0.6368};
     double probe_max_time[] = {30.23, 87.98};

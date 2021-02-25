@@ -104,7 +104,7 @@ public:
 
     pt.put("AdaptStart", 100);
     pt.put("AdaptSteps", 100);
-    pt.put("InitialVariance", 0.5);
+    pt.put("InitialVariance", 100);
     return std::make_shared<AMProposal>(pt, samplingProblem);
 
     /*auto mu = Eigen::VectorXd::Zero(NUM_PARAM);
