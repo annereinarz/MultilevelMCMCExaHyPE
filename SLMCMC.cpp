@@ -49,7 +49,9 @@ int main(int argc, char** argv){
   std::cout << std::endl << "*************** single chain reference" << std::endl << std::endl;
 
   {
-    SLMCMC slmcmc (pt, componentFactory);
+    auto modelIndex = componentFactory->FinestIndex();
+    modelIndex->SetValue(0,0);
+    SLMCMC slmcmc (pt, componentFactory, modelIndex);
     std::shared_ptr<SampleCollection> samples = slmcmc.Run();
 
     std::cout << "SL mean Param: " << slmcmc.MeanParameter().transpose() << std::endl;
