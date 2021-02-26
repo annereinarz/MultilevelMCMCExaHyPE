@@ -70,11 +70,12 @@ int main(int argc, char** argv){
 
   count = 0;
 
+  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
+
   std::time_t result = std::time(nullptr);
   std::string timestamp = std::asctime(std::localtime(&result));
+  comm->Bcast(timestamp, 0);
   auto tracer = std::make_shared<OTF2Tracer>("trace",timestamp);
-
-  auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
 
 { // Inverse UQ
   auto componentFactory = std::make_shared<MyMIComponentFactory>(comm);
