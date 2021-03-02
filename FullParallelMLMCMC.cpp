@@ -61,6 +61,8 @@ class MyStaticLoadBalancer : public StaticLoadBalancer {
 };
 
 int main(int argc, char** argv){
+  spdlog::set_level(spdlog::level::debug);
+
   saved_argc = argc;
   saved_argv = argv;
 
@@ -83,11 +85,11 @@ int main(int argc, char** argv){
   pt::ptree pt;
 
   pt.put("verbosity", 1); // show some output
-  pt.put("MCMC.BurnIn", 10);
-  pt.put("NumSamples_0", 650);
-  //pt.put("NumSamples_1", 5e1);
-  pt.put("MLMCMC.Scheduling", true);
-  pt.put("MLMCMC.Subsampling", 10);
+  pt.put("MCMC.BurnIn", 0);
+  pt.put("NumSamples_0", 50);
+  pt.put("NumSamples_1", 15);
+  pt.put("MLMCMC.Scheduling",false);
+  pt.put("MLMCMC.Subsampling", 0);
 
 
   StaticLoadBalancingMIMCMC parallelMIMCMC (pt, componentFactory, std::make_shared<MyStaticLoadBalancer>(), comm, tracer);
@@ -97,15 +99,11 @@ int main(int argc, char** argv){
     std::cout << "mean QOI: " << meanQOI.transpose() << std::endl;
   }
 
-  comm->Barrier();
   if (comm->GetRank() == 0)
     remove("FullParallelMLMCMC.hdf5");
-  comm->Barrier();
 
   parallelMIMCMC.WriteToFile("FullParallelMLMCMC.hdf5");
   parallelMIMCMC.Finalize();
-
-
 }
 
   tracer->write();
