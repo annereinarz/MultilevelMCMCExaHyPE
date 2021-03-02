@@ -49,9 +49,11 @@ public:
 
     //Discard stupid parameters
     if (param[0] > 739.0 || param[0] < -239.0 || param[1]>339.0 || param[1]<-339.0){ //reject parameters outside domain
-	    std::ofstream ost;
-	    ost.open("likelihood_r"+std::to_string(globalComm->GetRank())+".log", std::ios::app);
-	    ost << std::exp(-24) << std::endl;
+      if(comm->GetRank()==0){
+        std::ofstream ost;
+        ost.open("likelihood_r"+std::to_string(globalComm->GetRank())+".log", std::ios::app);
+        ost << std::exp(-24) << std::endl;
+      }
 	    return -24;
     }
 
@@ -65,7 +67,10 @@ public:
 
     comm->Barrier();
     double sigma = 1.0;
-    return calculateLikelihood(output,globalComm->GetRank(), level);// - 0.5/(sigma*sigma)*state->state[0].squaredNorm();
+    double likelihood = 1234;
+    if (comm->GetRank() == 0) // Only controller rank does likelihood calculation (muq expects this, so it's fine)
+      likelihood = calculateLikelihood(output,globalComm->GetRank(), level);
+    return likelihood;
   };
 
   virtual std::shared_ptr<SamplingState> QOI() override {
