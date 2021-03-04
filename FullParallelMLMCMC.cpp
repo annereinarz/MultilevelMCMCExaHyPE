@@ -80,8 +80,6 @@ int main(int argc, char** argv){
   auto tracer = std::make_shared<OTF2Tracer>("trace",timestamp);
 
 { // Inverse UQ
-  auto componentFactory = std::make_shared<MyMIComponentFactory>(comm);
-
   pt::ptree pt;
 
   pt.put("verbosity", 1); // show some output
@@ -89,7 +87,10 @@ int main(int argc, char** argv){
   pt.put("NumSamples_0", 50);
   pt.put("NumSamples_1", 15);
   pt.put("MLMCMC.Scheduling",false);
-  pt.put("MLMCMC.Subsampling", 0);
+  pt.put("MLMCMC.Subsampling_0", 20);
+  pt.put("MLMCMC.Subsampling_1", 0);
+
+  auto componentFactory = std::make_shared<MyMIComponentFactory>(pt, comm);
 
 
   StaticLoadBalancingMIMCMC parallelMIMCMC (pt, componentFactory, std::make_shared<MyStaticLoadBalancer>(), comm, tracer);

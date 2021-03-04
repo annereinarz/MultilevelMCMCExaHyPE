@@ -95,7 +95,7 @@ public:
 
 class MyMIComponentFactory : public ParallelizableMIComponentFactory {
 public:
-  MyMIComponentFactory(std::shared_ptr<parcer::Communicator> globalComm) : _globalComm(globalComm) {}
+  MyMIComponentFactory(pt::ptree pt, std::shared_ptr<parcer::Communicator> globalComm) : _pt(pt), _globalComm(globalComm) {}
 
   virtual std::shared_ptr<MCMCProposal> Proposal (std::shared_ptr<MultiIndex> const& index, std::shared_ptr<AbstractSamplingProblem> const& samplingProblem) override {
     pt::ptree pt;
@@ -132,14 +132,13 @@ public:
     return index;
   }
 
-  virtual std::shared_ptr<MCMCProposal> CoarseProposal (std::shared_ptr<MultiIndex> const& index,
+  virtual std::shared_ptr<MCMCProposal> CoarseProposal (std::shared_ptr<MultiIndex> const& fineIndex,
+                                                        std::shared_ptr<MultiIndex> const& coarseIndex,
                                                         std::shared_ptr<AbstractSamplingProblem> const& coarseProblem,
                                                         std::shared_ptr<SingleChainMCMC> const& coarseChain) override {
-    pt::ptree ptProposal;
+    pt::ptree ptProposal = _pt;
     ptProposal.put("BlockIndex",0);
-    int subsampling = 5;
-    ptProposal.put("Subsampling", subsampling);
-    return std::make_shared<SubsamplingMIProposal>(ptProposal, coarseProblem, coarseChain);
+    return std::make_shared<SubsamplingMIProposal>(ptProposal, coarseProblem, coarseIndex, coarseChain);
   }
 
   virtual std::shared_ptr<AbstractSamplingProblem> SamplingProblem (std::shared_ptr<MultiIndex> const& index) override {
@@ -162,5 +161,6 @@ public:
 private:
   std::shared_ptr<parcer::Communicator> _comm;
   std::shared_ptr<parcer::Communicator> _globalComm;
+  pt::ptree _pt;
 
 };
