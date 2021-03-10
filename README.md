@@ -68,8 +68,10 @@ make -j40 link_muq
 
 git clone git@bitbucket.org:mituq/muq2.git
 
+git checkout linus/mimcmc-cleanups
+
 Adapt paths to your local archives!
-cmake -DCMAKE_CXX_FLAGS="-std=c++0x" -DMUQ_USE_OPENMP=OFF -DMUQ_USE_MPI=ON -DCMAKE_CXX_COMPILER=mpiicpc -DMPI_CXX_COMPILER=mpiicpc -DCMAKE_INSTALL_PREFIX=$PWD/install -DPARCER_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/parcer.zip -DHDF5_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/CMake-hdf5-1.8.19.tar.gz -DEIGEN_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/eigen-3.3.7.tar.bz2 -DNLOPT_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/nlopt-2.4.2.tar.gz -DBOOST_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/boost_1_63_0.tar.gz -DNANOFLANN_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/nanoflann.zip -DSTANMATH_EXTERNAL_SOURCE=$HOME/MUQ/muq_dependencies/stanmath.zip ..
+cmake -DCMAKE_CXX_FLAGS="-std=c++0x" -DMUQ_USE_OPENMP=OFF -DMUQ_USE_MPI=ON -DCMAKE_CXX_COMPILER=mpiicpc -DMPI_CXX_COMPILER=mpiicpc -DCMAKE_INSTALL_PREFIX=$PWD/install -DPARCER_EXTERNAL_SOURCE=/hppfs/work/pr83no/ge68wax4/MUQ/muq_dependencies/parcer.zip -DEIGEN_EXTERNAL_SOURCE=/hppfs/work/pr83no/ge68wax4/MUQ/muq_dependencies/eigen-3.3.7.tar.bz2 -DNLOPT_EXTERNAL_SOURCE=/hppfs/work/pr83no/ge68wax4/MUQ/muq_dependencies/nlopt-2.4.2.tar.gz -DBOOST_EXTERNAL_SOURCE=/hppfs/work/pr83no/ge68wax4/MUQ/muq_dependencies/boost_1_63_0.tar.gz -DNANOFLANN_EXTERNAL_SOURCE=/hppfs/work/pr83no/ge68wax4/MUQ/muq_dependencies/nanoflann.zip -DSTANMATH_EXTERNAL_SOURCE=/hppfs/work/pr83no/ge68wax4/MUQ/muq_dependencies/stanmath.zip ..
 
 make -j40 install
 
