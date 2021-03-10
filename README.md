@@ -42,9 +42,9 @@ Running your binary requires the .exahype2 file to be passed:
 since gaining access to all external repositories is a lot of work: use the download_dependencies script to download them and push MUQ dependencies as archives onto supermuc
 
 ##Modules:
-module load tbb
+module load tbb/2019
 module load python/3.6_intel
-module load cmake/3.10
+module load cmake/3.14.4
 
 ##ExaHyPE:
 git clone git@gitlab.lrz.de:exahype/ExaHyPE-Engine.git
@@ -79,4 +79,5 @@ make -j40 install
 
 git clone git@github.com:annereinarz/MultilevelMCMCExaHyPE.git
 
-cmake -DCMAKE_PREFIX_PATH=$HOME/MUQ/muq2/build ..
+CC=mpicc CXX=mpicxx cmake -DCMAKE_PREFIX_PATH=/dss/dsshome1/0C/ge68wax4/MUQ/muq2/build ..
+
