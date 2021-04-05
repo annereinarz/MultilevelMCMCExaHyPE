@@ -6,35 +6,26 @@
 
 using namespace kernels;
 
-double grav;
-double epsilon;
-
-tarch::logging::Log SWE::MySWESolver_FV::_log( "SWE::MySWESolver_FV" );
-
 void SWE::MySWESolver_FV::init(const std::vector<std::string>& cmdlineargs,const exahype::parser::ParserView& constants) {
-    if (constants.isValueValidDouble( "grav" )) {
-        grav = constants.getValueAsDouble("grav")/1000.0;
-    }
-    if (constants.isValueValidDouble( "epsilon" )) {
-        epsilon = constants.getValueAsDouble( "epsilon" )/100.0;
-    }
 }
 
 
 
 void SWE::MySWESolver_FV::adjustSolution(const double* const x,const double t,const double dt, double* const Q) {
-  // Dimensions             = 2
-  // Number of variables    = 4 + #parameters
-
-  if (tarch::la::equals(t,0.0)) {
-    muq::initialData_nobath->getInitialData(x, Q);
-  }
-  else{
-    if(Q[0] < epsilon){
-      Q[1] = 0;
-      Q[2] = 0;      
-    }
-  }
+	// Dimensions             = 2
+	// Number of variables    = 4 + #parameters
+	if (tarch::la::equals(t,0.0)) {
+		static tarch::multicore::BooleanSemaphore initializationSemaphoreDG;
+		tarch::multicore::Lock lock(initializationSemaphoreDG);
+		muq::initialDataFV->getInitialData(x, Q);
+		lock.free();
+	}
+	else{
+		if(Q[0] < muq::epsilon){
+			Q[1] = 0;
+			Q[2] = 0;      
+		}
+	}
 }
 
 void SWE::MySWESolver_FV::eigenvalues(const double* const Q, const int dIndex, double* const lambda) {
@@ -44,14 +35,18 @@ void SWE::MySWESolver_FV::eigenvalues(const double* const Q, const int dIndex, d
   ReadOnlyVariables vars(Q);
   Variables eigs(lambda);
 
-  const double c = std::sqrt(grav * vars.h());
-  double u_n = Q[dIndex + 1] * vars.h() * std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), epsilon), 4));
+  const double c = std::sqrt(muq::grav * vars.h());
+  double u_n = Q[dIndex + 1] * vars.h() * std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), muq::epsilon), 4));
 
   eigs.h() = u_n + c;
   eigs.hu() = u_n - c;
   eigs.hv() = u_n;
-  eigs.b() = std::sqrt(grav * epsilon);
- 
+  eigs.b() = 0.0;
+
+  if(tarch::la::equals(u_n,0.0) && tarch::la::equals(c,0.0)){
+    eigs.h() = std::sqrt(muq::grav * muq::epsilon);
+  }
+
 }
 
 void SWE::MySWESolver_FV::boundaryValues(
@@ -79,7 +74,7 @@ void SWE::MySWESolver_FV::boundaryValues(
   stateOutside[3] = stateInside[3];
 
   //Wall
-  stateOutside[d + 1] = -stateInside[d + 1];
+  //stateOutside[d + 1] = -stateInside[d + 1];
 }
 
 //***********************************************************
@@ -98,17 +93,17 @@ void SWE::MySWESolver_FV::flux(const double* const Q,double** const F) {
   double* f = F[0];
   double* g = F[1];
 
-  double u_n = vars.hu() * vars.h() *std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), epsilon), 4));
-  double v_n = vars.hv() * vars.h() *std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), epsilon), 4));
+  double u_n = vars.hu() * vars.h() *std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), muq::epsilon), 4));
+  double v_n = vars.hv() * vars.h() *std::sqrt(2)/std::sqrt(std::pow(vars.h(), 4) + std::pow(std::max(vars.h(), muq::epsilon), 4));
 
   f[0] = vars.h() * u_n;
-  f[1] = vars.h() * u_n * u_n; // 0.5 * grav * vars.h() * vars.h();
+  f[1] = vars.h() * u_n * u_n; // 0.5 * muq::grav * vars.h() * vars.h();
   f[2] = vars.h() * u_n * v_n;
   f[3] = 0.0;
 
   g[0] = vars.h() * v_n;
   g[1] = vars.h() * u_n * v_n;
-  g[2] = vars.h() * v_n * v_n; // 0.5 * grav * vars.h() * vars.h();
+  g[2] = vars.h() * v_n * v_n; // 0.5 * muq::grav * vars.h() * vars.h();
   g[3] = 0.0;
  
 }
@@ -141,22 +136,21 @@ double SWE::MySWESolver_FV::riemannSolver(double* const fL, double* const fR, co
     flux[0] = 0.5 * (FL[direction][0] + FR[direction][0]) - 0.5 * smax * (qR[0] + qR[3] - qL[0] - qL[3]);
     flux[1] = 0.5 * (FL[direction][1] + FR[direction][1]) - 0.5 * smax * (qR[1] - qL[1]);
     flux[2] = 0.5 * (FL[direction][2] + FR[direction][2]) - 0.5 * smax * (qR[2] - qL[2]);
-    flux[3] = 0.5 * (FL[direction][3] + FR[direction][3]);
+    flux[3] = 0.0;
 
-	if (FL[direction][3] != 0.0 || FR[direction][3] != 0.0)
-	std::cout << FL[direction][3] << ", " <<  FR[direction][3] << std::endl;
+    if (FL[direction][3] != 0.0 || FR[direction][3] != 0.0)
+	    std::cout << FL[direction][3] << ", " <<  FR[direction][3] << std::endl;
 
     double hRoe = 0.5*(qL[0] + qR[0]);
 
     double bm = std::max(qL[3], qR[3]);
-    double Deta = std::max(qR[0]+qR[3] - bm, 0.0) - std::max(qL[0]+qL[3] - bm, 0.0);
+    double Delta = std::max(qR[0]+qR[3] - bm, 0.0) - std::max(qL[0]+qL[3] - bm, 0.0);
 
     double djump[NumberOfVariables] = {0.0};
 
-    djump[direction + 1] = 0.5*grav*hRoe*Deta;
+    djump[direction + 1] = 0.5*muq::grav*hRoe*Delta;
 
-
-    flux[0] = 0.5 * (FL[direction][0] + FR[direction][0]) - 0.5*smax*Deta;
+    flux[0] = 0.5 * (FL[direction][0] + FR[direction][0]) - 0.5*smax*Delta;
     for (int i = 0; i < NumberOfVariables; i++){
         fL[i] = flux[i] + djump[i];
         fR[i] = flux[i] - djump[i];

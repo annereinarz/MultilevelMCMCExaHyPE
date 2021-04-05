@@ -40,11 +40,12 @@ void SWE::ProbeWriter19::mapQuantities(
   outputQuantities[4] = 0.0;
   if(Q[3] < 0.0)
       outputQuantities[4] = Q[3]+Q[0];
-//std::vector<std::vector<double>> probe_point = {{ 545.735266126, 62.7164740303 },
+
+  //std::vector<std::vector<double>> probe_point = {{ 545.735266126, 62.7164740303 },
   //						     { 1050.67821,   798.352124}};
   if(outputQuantities[4] > muq::solution[1+2*1]){
 	  muq::solution[0+2*1] = timeStamp; 
 	  muq::solution[1+2*1] = outputQuantities[4];
-	  //std::cout <<"Probe" << 1 << " has time " << muq::solution[0+2*1]/60 << " and height " << muq::solution[1+2*1]*1000 << std::endl;
+	  //std::cout <<"Probe" << 0 << " has time " << muq::solution[0+2*0]/60 << " and height " << muq::solution[1+2*0]*1000 << std::endl;
   }
 }

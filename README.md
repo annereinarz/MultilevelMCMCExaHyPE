@@ -79,5 +79,5 @@ make -j40 install
 
 git clone git@github.com:annereinarz/MultilevelMCMCExaHyPE.git
 
-CC=mpicc CXX=mpicxx cmake -DCMAKE_PREFIX_PATH=/dss/dsshome1/0C/ge68wax4/MUQ/muq2/build ..
+CC=mpicc CXX=mpicxx cmake -DCMAKE_PREFIX_PATH=[path-to-muq]/MUQ/muq2/build ..
 

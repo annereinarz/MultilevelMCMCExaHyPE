@@ -28,24 +28,49 @@ int main(int argc, char** argv){
   muq::initParallelEnvironment(&argc,&argv);
   count = 0;
 
-
   auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
-  auto localFactory = std::make_shared<MyMIComponentFactory>(comm);
+
+
+  pt::ptree pt;
+
+  pt.put("NumSamples", 500); // number of samples for single level
+  pt.put("verbosity", 1); // show some output
+  pt.put("BurnIn", 100);
+
+  auto localFactory = std::make_shared<MyMIComponentFactory>(pt, comm);
+
+  /*auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
+  pt::ptree pt;
+  auto localFactory = std::make_shared<MyMIComponentFactory>(pt, comm);*/
   localFactory->SetComm(comm);
 
-  auto index = localFactory->FinestIndex();
-
-  do {
-    std::cout << "Testing model " << *index << std::endl;
-    std::cout << "============================================" << std::endl;
-    auto problem = localFactory->SamplingProblem(index);
-    double logdens = problem->LogDensity(std::make_shared<SamplingState>(localFactory->StartingPoint(index)));
-    std::cout << "LogDensity: " << logdens << std::endl;
-    problem->QOI();
-    index->SetValue(0, index->GetValue(0) - 1);
-  } while (index->GetValue(0) > 0);
+  auto componentFactory = std::make_shared<ParallelMIComponentFactory>(comm, comm, localFactory);
 
 
+
+  if (comm->GetRank() == 0) {
+    Eigen::VectorXd testparam(2);
+    testparam << 0.0,0.0;
+    //testparam << 4.67169, 21.3935;
+    for (int repeat = 0; repeat <= 1; repeat++) {
+    auto index = localFactory->FinestIndex();
+    while (true){
+      std::cout << "Testing model " << *index << " for parameter " << std::endl << testparam << std::endl;
+      std::cout << "============================================" << std::endl;
+      auto problem = componentFactory->SamplingProblem(index);
+      //double logdens = problem->LogDensity(std::make_shared<SamplingState>(localFactory->StartingPoint(index)));
+      double logdens = problem->LogDensity(std::make_shared<SamplingState>(testparam));
+      std::cout << "LogDensity: " << logdens << std::endl;
+    
+      std::cout << "Got QOI:" << std::endl;
+      std::cout << problem->QOI()->state[0] << std::endl;
+      if (index->GetValue(0) == 0)
+        break;
+      index->SetValue(0, index->GetValue(0) - 1);
+    }
+    }
+  }
+  componentFactory->finalize();
   muq::finalize();
   MPI_Finalize();
   return 0;

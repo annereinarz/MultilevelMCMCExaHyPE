@@ -22,7 +22,9 @@ double calculateLikelihood(std::vector<double> solution, int rank, int level){
         double diff_height =  solution[1+2*i_probe]*1000.0 - probe_max_height[i_probe];
         //std::cout << "Max height diff " << diff_height << std::endl;
         std::cout << "Probe "<< i_probe << " height   " <<  solution[1+2*i_probe]*1000.0 << std::endl;
+        std::cout << "Probe "<< i_probe << " correct height   " <<  probe_max_height[i_probe] << std::endl;
         std::cout << "Probe "<< i_probe << " time   " <<  solution[0+2*i_probe]/60 << std::endl;
+        std::cout << "Probe "<< i_probe << " correct time   " <<  probe_max_time[i_probe] << std::endl;
         double diff_time = solution[0+2*i_probe]/60.0 - probe_max_time[i_probe];
         //std::cout << "Arrival time diff " << diff_time  << std::endl;
     	likelihood -= 1.0/numProbes * .5 * (std::pow(diff_time,2)/likelihood_var_time[level]+

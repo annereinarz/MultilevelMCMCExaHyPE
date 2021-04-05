@@ -63,7 +63,7 @@ class SWE::MySWESolver_ADERDG : public SWE::AbstractMySWESolver_ADERDG {
      *                         as C array (already allocated).
      */
 
-    void adjustSolution(double* const luh,const tarch::la::Vector<DIMENSIONS,double>& cellCentre,const tarch::la::Vector<DIMENSIONS,double>& cellSize,double t,double dt) final override;
+    void adjustPointSolution(const double* const x,const double t,const double dt,double* const Q) final override;
     
 /**
      * Compute the eigenvalues of the flux tensor per coordinate direction \p d.

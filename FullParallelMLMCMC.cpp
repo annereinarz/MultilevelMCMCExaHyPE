@@ -61,7 +61,7 @@ class MyStaticLoadBalancer : public StaticLoadBalancer {
 };
 
 int main(int argc, char** argv){
-  spdlog::set_level(spdlog::level::debug);
+  spdlog::set_level(spdlog::level::trace);
 
   saved_argc = argc;
   saved_argv = argv;
@@ -83,11 +83,13 @@ int main(int argc, char** argv){
   pt::ptree pt;
 
   pt.put("verbosity", 1); // show some output
-  pt.put("MCMC.BurnIn", 0);
-  pt.put("NumSamples_0", 50);
-  pt.put("NumSamples_1", 15);
-  pt.put("MLMCMC.Scheduling",false);
-  pt.put("MLMCMC.Subsampling_0", 20);
+  //pt.put("MCMC.BurnIn", 100);
+  pt.put("MCMC.BurnIn", 50);
+  pt.put("NumSamples_0", 30);
+  pt.put("NumSamples_1", 12);
+  pt.put("MLMCMC.Scheduling",true);
+  pt.put("MLMCMC.Subsampling_0", 49);
+  //pt.put("MLMCMC.Subsampling_0", 0);
   pt.put("MLMCMC.Subsampling_1", 0);
 
   auto componentFactory = std::make_shared<MyMIComponentFactory>(pt, comm);
@@ -107,7 +109,7 @@ int main(int argc, char** argv){
   parallelMIMCMC.Finalize();
 }
 
-  tracer->write();
+  //tracer->write();
 
   muq::finalize();
   MPI_Finalize();

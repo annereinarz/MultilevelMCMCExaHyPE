@@ -9,7 +9,7 @@
   "architecture": "skx",
   "computational_domain": {
     "dimension": 2,
-    "end_time": 5400.0,
+    "end_time": 5600.0,
     "offset": [
       -499.0,
       -949.0
@@ -23,10 +23,10 @@
     "cores": 48,
     "properties_file": "sharedmemory.properties",
     "autotuning_strategy": "dummy",
-    "background_job_consumers": 23
+    "background_job_consumers": 47
   },
   "distributed_memory": {
-    "timeout": 6,
+    "timeout": 10000,
     "load_balancing_type": "static",
     "buffer_size": 1600,
     "load_balancing_strategy": "hotspot",
@@ -40,250 +40,101 @@
     "spawn_predictor_as_background_thread": false,
     "spawn_amr_background_threads": false,
     "disable_vertex_exchange_in_time_steps": true,
-    "time_step_batch_factor": 1.0,
+    "time_step_batch_factor": 0.0,
     "disable_metadata_exchange_in_batched_time_steps": true,
     "double_compression": 0.0,
     "spawn_double_compression_as_background_thread": false
   },
   "solvers": [
-    {
-      "type": "Limiting-ADER-DG",
-      "name": "MySWESolver",
-      "order": 2,
-      "maximum_mesh_size": 80,
-      "maximum_mesh_depth": 0,
-      "time_stepping": "globalfixed",
-      "aderdg_kernel": {
-        "language": "C",
-        "nonlinear": true,
-        "terms": [
-          "flux",
-          "ncp"
-        ],
-        "space_time_predictor": {},
-        "optimised_terms": [],
-        "optimised_kernel_debugging": [],
-        "implementation": "optimised",
-	"adjust_solution": "patchwise",
-	"allocate_temporary_arrays": "stack"
-      },
-      "point_sources": 0,
-      "limiter": {
-        "dmp_observables": 0,
-        "dmp_relaxation_parameter": 100000000.0,
-        "dmp_difference_scaling": 100000000.0,
-        "implementation": "generic"
-      },
-      "fv_kernel": {
-        "language": "C",
-        "terms": [
-          "flux"
-        ],
-        "scheme": "godunov",
-        "implementation": "generic",
-        "allocate_temporary_arrays": "stack"
-      },
-      "variables": [
-        {
-          "name": "h",
-          "multiplicity": 1
-        },
-        {
-          "name": "hu",
-          "multiplicity": 1
-        },
-        {
-          "name": "hv",
-          "multiplicity": 1
-        },
-        {
-          "name": "b",
-          "multiplicity": 1
-        }
-      ],
-      "parameters": {
-        "grav": 9.81,
-        "epsilon": 10.0,
-        "scenario": 15
-      },
-      "plotters": [
-      {
-          "type": "probe::ascii",
-          "name": "ProbeWriter18",
-          "time": 0.0,
-          "repeat": 10.0,
-          "output": "./buoy18",
-          "variables": 5,
-          "select": {
-            "x": 545.735266126,
-            "y": 62.7164740303
-          }
-      },
-      {
-          "type": "probe::ascii",
-          "name": "ProbeWriter19",
-          "time": 0.0,
-          "repeat": 10.0,
-          "output": "./buoy19",
-          "variables": 5,
-          "select": {
-            "x": 1050.67821,
-            "y": 798.352124
+  {
+	  "type": "Limiting-ADER-DG",
+	  "name": "MySWESolver",
+	  "order": 2,
+	  "maximum_mesh_size": 120,
+	  "maximum_mesh_depth": 0,
+	  "time_stepping": "globalfixed",
+	  "aderdg_kernel": {
+		  "language": "C",
+		  "nonlinear": true,
+		  "terms": [
+			  "flux",
+		           "ncp"
+			  ],
+		  "space_time_predictor": {},
+		  "optimised_terms": [],
+		  "optimised_kernel_debugging": [],
+		  "implementation": "generic",
+		  "allocate_temporary_arrays": "stack"
+	  },
+	  "point_sources": 0,
+	  "limiter": {
+		  "dmp_observables": 1,
+		  "dmp_relaxation_parameter": 100000000.0,
+		  "dmp_difference_scaling": 100000000.0,
+		  "implementation": "generic"
+	  },
+
+	  "fv_kernel": {
+		  "language": "C",
+		  "terms": [
+			  "flux"
+			  ],
+		  "scheme": "godunov",
+		  "implementation": "generic",
+		  "allocate_temporary_arrays": "stack"
+	  },
+	  "variables": [
+	  {
+		  "name": "h",
+		  "multiplicity": 1
+	  },
+	  {
+		  "name": "hu",
+		  "multiplicity": 1
+	  },
+	  {
+		  "name": "hv",
+		  "multiplicity": 1
+	  },
+	  {
+		  "name": "b",
+		  "multiplicity": 1
 	  }
-      }
-      ]
-    },
-    {
-      "type": "Limiting-ADER-DG",
-      "name": "MySWESolver_p2",
-      "order": 2,
-      "maximum_mesh_size": 30,
-      "maximum_mesh_depth": 0,
-      "time_stepping": "global",
-      "aderdg_kernel": {
-        "language": "C",
-        "nonlinear": true,
-        "terms": [
-          "flux",
-          "ncp"
-        ],
-        "space_time_predictor": {},
-        "optimised_terms": [],
-        "optimised_kernel_debugging": [],
-        "implementation": "optimised",
-	"adjust_solution": "patchwise",
-	"allocate_temporary_arrays": "stack"
-      },
-      "point_sources": 0,
-      "limiter": {
-        "dmp_observables": 0,
-        "dmp_relaxation_parameter": 100000000.0,
-        "dmp_difference_scaling": 100000000.0,
-        "implementation": "generic"
-      },
-      "fv_kernel": {
-        "language": "C",
-        "terms": [
-          "flux",
-          "ncp"
-        ],
-        "scheme": "godunov",
-        "implementation": "generic",
-        "allocate_temporary_arrays": "stack"
-      },
-      "variables": [
-        {
-          "name": "h",
-          "multiplicity": 1
-        },
-        {
-          "name": "hu",
-          "multiplicity": 1
-        },
-        {
-          "name": "hv",
-          "multiplicity": 1
-        },
-        {
-          "name": "b",
-          "multiplicity": 1
-        }
-      ],
-      "parameters": {
-        "grav": 9.81,
-        "epsilon": 10.0,
-        "scenario": 14
-      },
-      "plotters": [
-        {
-          "type": "probe::ascii",
-          "name": "ProbeWriter_p2_18",
-          "time": 0.0,
-          "repeat": 10.0,
-          "output": "./buoy-p2-18",
-          "variables": 5,
-          "select": {
-            "x": 545.735266126,
-            "y": 62.7164740303
-          }
-        }
-      ]
-    },
-    {
-      "type": "Limiting-ADER-DG",
-      "name": "MySWESolver_p3",
-      "order": 3,
-      "maximum_mesh_size": 30,
-      "maximum_mesh_depth": 0,
-      "time_stepping": "global",
-      "aderdg_kernel": {
-        "language": "C",
-        "nonlinear": true,
-        "terms": [
-          "flux",
-          "ncp"
-        ],
-        "space_time_predictor": {},
-        "optimised_terms": [],
-        "optimised_kernel_debugging": [],
-        "implementation": "optimised",
-	"adjust_solution": "patchwise",
-	"allocate_temporary_arrays": "stack"
-      },
-      "point_sources": 0,
-      "limiter": {
-        "dmp_observables": 4,
-        "dmp_relaxation_parameter": 100000000.0,
-        "dmp_difference_scaling": 100000000.0,
-        "implementation": "generic"
-      },
-      "fv_kernel": {
-        "language": "C",
-        "terms": [
-          "flux",
-          "ncp"
-        ],
-        "scheme": "godunov",
-        "implementation": "generic",
-        "allocate_temporary_arrays": "stack"
-      },
-      "variables": [
-        {
-          "name": "h",
-          "multiplicity": 1
-        },
-        {
-          "name": "hu",
-          "multiplicity": 1
-        },
-        {
-          "name": "hv",
-          "multiplicity": 1
-        },
-        {
-          "name": "b",
-          "multiplicity": 1
-        }
-      ],
-      "parameters": {
-        "grav": 9.81,
-        "epsilon": 10.0,
-        "scenario": 14
-      },
-      "plotters": [
-        {
-          "type": "probe::ascii",
-          "name": "ProbeWriter_p3_18",
-          "time": 0.0,
-          "repeat": 10.0,
-          "output": "./buoy-p3-18",
-          "variables": 5,
-          "select": {
-            "x": 545.735266126,
-            "y": 62.7164740303
-          }
-        }
-      ]
-    }
-  ]
+	  ],
+		  "plotters": [
+		  {
+			  "type": "probe::ascii",
+			  "name": "ProbeWriter18",
+			  "time": 0.0,
+			  "repeat": 10.0,
+			  "output": "./Probes/buoy18",
+			  "variables": 5,
+			  "select": {
+				  "x": 545.735266126,
+				  "y": 62.7164740303
+			  }
+		  },
+		  {
+			  "type": "probe::ascii",
+			  "name": "ProbeWriter19",
+			  "time": 0.0,
+			  "repeat": 10.0,
+			  "output": "./Probes/buoy19",
+			  "variables": 5,
+			  "select": {
+				  "x": 1050.67821,
+				  "y": 798.352124
+			  }
+		  },
+		  {
+			  "type": "vtu::Cartesian::cells::limited::ascii",
+			  "name": "ConservedWriter",
+			  "time": 0.0,
+			  "repeat": 200.0,
+			  "output": "./vtk-output/limited",
+			  "variables": 5
+		  }
+	  ]
+  } 
+ ]
 }

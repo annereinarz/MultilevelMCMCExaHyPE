@@ -44,23 +44,26 @@ namespace muq{
 
 	exahype::parser::Parser parser;
 	std::vector<std::string> cmdlineargs;
-
+	bool programExitCode;
+	
 	//initialise global variables
+	InitialData* initialData;
+	InitialData* initialDataFV;
+	
+	double grav = 9.81;
+	double epsilon_DG = 1e-2;
+        double epsilon = 1e-2;
+	int level = 0;
 	int subcommunicator_rank = 0;
-	double mesh_width = 0.0;
+	int sample_number = 0;
 	std::vector<double> param = {0.6,0.6};
 	std::vector<double> solution = {};
-	InitialData* initialData_nobath = new InitialData(14,"data_gmt.yaml");
-	InitialData* initialData = new InitialData(14,"data.yaml");
 
 	int finalize(){
-		delete initialData_nobath;
-		delete initialData;
-		kernels::finalise();
-		peano::releaseCachedData();
 		peano::shutdownParallelEnvironment();
 		peano::shutdownSharedMemoryEnvironment();
-		return 0;//programExitCode;
+		peano::releaseCachedData();
+		return programExitCode;
 	}
 
 	bool initParallelEnvironment(int* argc, char*** argv){
@@ -201,7 +204,6 @@ namespace muq{
 		//   Init solver registries
 		// =====================================
 		//
-		kernels::registerSolvers(parser);
 
 		//
 		//   Configure the logging
@@ -239,19 +241,30 @@ namespace muq{
 
 		tarch::logging::CommandLineLogger::getInstance().clearFilterList();
 		tarch::logging::LogFilterFileReader::parsePlainTextFile( "exahype.log-filter" );
-		return 0;
-	}
-
-	std::vector<double> run_exahype(std::vector<double> param_, int globalcommunicator_rank_, int level=0){
-		muq::subcommunicator_rank = globalcommunicator_rank_;
 
 		muq::param.resize(2);
 		muq::solution.resize(4);
+		return 0;
+	}
+
+	std::vector<double> run_exahype(std::vector<double> param_, int globalcommunicator_rank_, int level_=0){
+		muq::subcommunicator_rank = globalcommunicator_rank_;
+		param=param_;  //store parameters
+		level = level_;
 		for(int i=0; i<muq::solution.size();i++)
 			muq::solution[i] = -1234.5;
-		param=param_;  //store parameters
+		if(level == 0){
+			initialData = new InitialData(15,"data_gmt.yaml");
+			initialDataFV = new InitialData(15,"data_gmt.yaml");
+		}
+		else{
+			initialData = new InitialData(14,"data_gmt.yaml");
+			initialDataFV = new InitialData(14,"data_gmt.yaml");
+
+		}
+		kernels::registerSolvers(parser,0);
 		exahype::runners::Runner runner(parser, cmdlineargs);
-		int programExitCode = runner.run(level);
+		int programExitCode = runner.run();
 		if (programExitCode == 0) {
 #ifdef Parallel
 			if (tarch::parallel::Node::getInstance().isGlobalMaster()) {
@@ -263,6 +276,10 @@ namespace muq{
 		} else {
 			logInfo("main()", "quit with error code " << programExitCode);
 		}
+		delete initialDataFV;
+		delete initialData;
+		kernels::finalise(0);
+		sample_number++;
 		return solution;
 	}
 

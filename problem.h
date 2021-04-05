@@ -6,6 +6,9 @@
 #include "MUQ/SamplingAlgorithms/ParallelizableMIComponentFactory.h"
 #include "MUQ/SamplingAlgorithms/SamplingProblem.h"
 #include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"
+#include <chrono> 
+using namespace std::chrono;
+
 
 //TODO: read in
 const int NUM_PARAM = 2;
@@ -48,21 +51,25 @@ public:
     }
 
     //Discard stupid parameters
-    if (param[0] > 739.0 || param[0] < -239.0 || param[1]>339.0 || param[1]<-339.0){ //reject parameters outside domain
-      if(comm->GetRank()==0){
-        std::ofstream ost;
-        ost.open("likelihood_r"+std::to_string(globalComm->GetRank())+".log", std::ios::app);
-        ost << std::exp(-24) << std::endl;
-      }
+    if (param[0] > 739.0 || param[0] < -0.0 || param[1]>339.0 || param[1]<-339.0){ //reject parameters outside domain
+	    std::ofstream ost;
+	    ost.open("likelihood_r"+std::to_string(globalComm->GetRank())+".log", std::ios::app);
+	    ost << std::exp(-24) << std::endl;
 	    return -24;
     }
 
     //run forward model
-    int level = index->GetValue(0);
+    const int level = index->GetValue(0);
     std::cout << "run_exahype with level " << level << " and global communicator number " << globalComm->GetRank()  << std::endl;
-    //muq::setCommunicator(comm->GetMPICommunicator());
-    //muq::init(saved_argc,saved_argv);
-    auto output = muq::run_exahype(param,globalComm->GetRank(), level);
+    auto start = high_resolution_clock::now();
+    int subgroup_consistent_rank = globalComm->GetRank();
+    comm->Bcast(subgroup_consistent_rank, 0);
+    comm->Barrier();
+    auto output = muq::run_exahype(param,subgroup_consistent_rank, level);
+    
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<seconds>(stop - start);
+    std::cout << "Sample took " << duration.count() << std::endl;
     //std::cout << "run_exahype has solution " << output[0] << " and " << output[1]  << std::endl;
 
     comm->Barrier();
@@ -110,7 +117,7 @@ public:
 
     pt.put("AdaptStart", 100);
     pt.put("AdaptSteps", 100);
-    pt.put("InitialVariance", 100);
+    pt.put("InitialVariance", 10);
     return std::make_shared<AMProposal>(pt, samplingProblem);
 
     /*auto mu = Eigen::VectorXd::Zero(NUM_PARAM);
@@ -128,7 +135,7 @@ public:
 
   virtual std::shared_ptr<MultiIndex> FinestIndex() override {
     auto index = std::make_shared<MultiIndex>(1);
-    index->SetValue(0, 0);
+    index->SetValue(0, 1);
     return index;
   }
 
@@ -153,8 +160,8 @@ public:
   virtual Eigen::VectorXd StartingPoint (std::shared_ptr<MultiIndex> const& index) override {
     //Starting guess: zero
     Eigen::VectorXd start = Eigen::VectorXd::Ones(NUM_PARAM);
-    start(0) = 10.0;
-    start(1) = 10.0;
+    start(0) = 7.0;
+    start(1) = 7.0;
     return start;
   }
 

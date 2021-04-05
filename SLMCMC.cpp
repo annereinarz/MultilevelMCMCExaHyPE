@@ -30,18 +30,15 @@ int main(int argc, char** argv){
 
 { // Inverse UQ
   auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
-  auto localFactory = std::make_shared<MyMIComponentFactory>(comm);
+
 
   pt::ptree pt;
 
-  pt.put("NumSamples", 10000); // number of samples for single level
-  pt.put("NumInitialSamples", 3); //ignore// number of initial samples for greedy MLMCMC
-  pt.put("GreedyTargetVariance", 0.05); //ignore// estimator variance to be achieved by greedy algorithm
+  pt.put("NumSamples", 1000); // number of samples for single level
   pt.put("verbosity", 1); // show some output
-  pt.put("BurnIn", 300);
-  pt.put("NumSamples_0", 1e2);
-  pt.put("NumSamples_1", 5e1);
+  pt.put("BurnIn", 0);
 
+  auto localFactory = std::make_shared<MyMIComponentFactory>(pt, comm);
   localFactory->SetComm(comm);
   auto componentFactory = std::make_shared<ParallelMIComponentFactory>(comm, comm, localFactory);
 
@@ -65,7 +62,6 @@ int main(int argc, char** argv){
   componentFactory->finalize();
 
 }
-
   muq::finalize();
   MPI_Finalize();
   return 0;

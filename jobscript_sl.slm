@@ -25,7 +25,7 @@
 
 # set number of nodes
 #SBATCH --nodes=1
-#SBATCH --ntasks=4
+#SBATCH --ntasks=1
 # #SBATCH --cpus-per-task=7
 
 export OMP_NUM_THREADS=48 # Ensures we actually get all cores (thanks, SLURM)

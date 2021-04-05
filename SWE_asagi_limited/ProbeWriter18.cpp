@@ -33,8 +33,6 @@ void SWE::ProbeWriter18::mapQuantities(
     double* const outputQuantities,
     double timeStamp
 ) {
-
-
   const int writtenUnknowns = 5;
   for (int i=0; i<writtenUnknowns-1; i++){ 
     outputQuantities[i] = Q[i];
@@ -43,7 +41,6 @@ void SWE::ProbeWriter18::mapQuantities(
   if(Q[3] < 0.0)
       outputQuantities[4] = Q[3]+Q[0];
 
-
   //std::vector<std::vector<double>> probe_point = {{ 545.735266126, 62.7164740303 },
   //						     { 1050.67821,   798.352124}};
   if(outputQuantities[4] > muq::solution[1+2*0]){
@@ -51,6 +48,5 @@ void SWE::ProbeWriter18::mapQuantities(
 	  muq::solution[1+2*0] = outputQuantities[4];
 	  //std::cout <<"Probe" << 0 << " has time " << muq::solution[0+2*0]/60 << " and height " << muq::solution[1+2*0]*1000 << std::endl;
   }
-
 
 }

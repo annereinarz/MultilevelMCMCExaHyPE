@@ -19,13 +19,15 @@
 namespace muq{
 
     extern int subcommunicator_rank;
-    extern double mesh_width;
+    extern int sample_number;
+    extern int level;
     extern std::vector<double> param;
     extern std::vector<double> solution;
-    extern InitialData* initialData_nobath;
     extern InitialData* initialData;
+    extern InitialData* initialDataFV;
+    extern double grav, epsilon_DG, epsilon;
 
-    /*void gatherProbes(int numProbes){
+       /*void gatherProbes(int numProbes){
 	    //Ensure that the solutions are distributed to all nodes
 	    MPI_Comm comm = tarch::parallel::Node::getInstance().getCommunicator();
 	    int numRanks = tarch::parallel::Node::getInstance().getNumberOfNodes();
