@@ -66,11 +66,10 @@ int main(int argc, char** argv){
   saved_argc = argc;
   saved_argv = argv;
 
-  int initThreadProvidedThreadLevelSupport;
-  //bool result = MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &initThreadProvidedThreadLevelSupport );
-  muq::initParallelEnvironment(&argc,&argv);
 
   count = 0;
+
+  MPI_Init(&argc, &argv);
 
   auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
 
@@ -111,7 +110,6 @@ int main(int argc, char** argv){
 
   //tracer->write();
 
-  muq::finalize();
   MPI_Finalize();
   return 0;
 }
