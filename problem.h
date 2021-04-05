@@ -6,7 +6,9 @@
 #include "MUQ/SamplingAlgorithms/ParallelizableMIComponentFactory.h"
 #include "MUQ/SamplingAlgorithms/SamplingProblem.h"
 #include "MUQ/SamplingAlgorithms/SubsamplingMIProposal.h"
-#include <chrono> 
+#include <chrono>
+#include <iomanip>
+
 using namespace std::chrono;
 
 
@@ -33,50 +35,59 @@ public:
   }
 
   virtual double LogDensity(std::shared_ptr<SamplingState> const& state) override {
-    comm->Barrier();
     lastState = state;
 
-    //Write parameters into ExaHyPE readable format
-    std::vector<double> param(state->state[0].size());
-    for(int i = 0; i < param.size(); i++){
-        param[i] = state->state[0][i];
-    }
-
-    //Create some debug output
-    if(comm->GetRank()==0){
-	    std::ofstream ost;
-	    ost.open("parameters_r" + std::to_string(globalComm->GetRank()) + ".log", std::ios::app);
-	    ost << param[0] << ", " << param[1] << std::endl;
-	    ost.close();
-    }
-
-    //Discard stupid parameters
-    if (param[0] > 739.0 || param[0] < -0.0 || param[1]>339.0 || param[1]<-339.0){ //reject parameters outside domain
-	    std::ofstream ost;
-	    ost.open("likelihood_r"+std::to_string(globalComm->GetRank())+".log", std::ios::app);
-	    ost << std::exp(-24) << std::endl;
-	    return -24;
-    }
-
-    //run forward model
-    const int level = index->GetValue(0);
-    std::cout << "run_exahype with level " << level << " and global communicator number " << globalComm->GetRank()  << std::endl;
-    auto start = high_resolution_clock::now();
     int subgroup_consistent_rank = globalComm->GetRank();
     comm->Bcast(subgroup_consistent_rank, 0);
-    comm->Barrier();
-    auto output = muq::run_exahype(param,subgroup_consistent_rank, level);
-    
+
+    std::string inputsfilename = "/tmp/inputs" + std::to_string(subgroup_consistent_rank) + ".txt";
+    std::string outputsfilename = "/tmp/outputs" + std::to_string(subgroup_consistent_rank) + ".txt";
+
+    std::ofstream inputsfile(inputsfilename);
+    typedef std::numeric_limits<double> dl;
+    inputsfile << std::fixed << std::setprecision(dl::digits10);
+    for (int i = 0; i < state->state[0].rows(); i++) {
+      inputsfile << state->state[0](i) << std::endl;
+    }
+    inputsfile.close();
+
+    auto start = high_resolution_clock::now();
+    // TODO: Need level dependence!
+    int status;
+    std::string inoutsuffix = inputsfilename + " " + outputsfilename;
+    if(index->GetValue(0) == 0) {
+      status = system((std::string("cd /hppfs/work/pr83no/ge68wax4/MUQ/ExaHyPE-Tsunami/ApplicationExamples/SWE/SWE_asagi_limited_l0 && ./ExaHyPE-SWE ../SWE_asagi_limited_l0.exahype2 ") + inoutsuffix).c_str());
+    } else if(index->GetValue(0) == 1) {
+      status = system((std::string("cd /hppfs/work/pr83no/ge68wax4/MUQ/ExaHyPE-Tsunami/ApplicationExamples/SWE/SWE_asagi_limited_l1 && ./ExaHyPE-SWE ../SWE_asagi_limited_l1.exahype2 ") + inoutsuffix).c_str());
+    } else if(index->GetValue(0) == 2) {
+      status = system((std::string("cd /hppfs/work/pr83no/ge68wax4/MUQ/ExaHyPE-Tsunami/ApplicationExamples/SWE/SWE_asagi_limited_l2 && ./ExaHyPE-SWE ../SWE_asagi_limited_l2.exahype2 ") + inoutsuffix).c_str());
+    } else {
+      std::cerr << "Unknown model requested by client!" << std::endl;
+      exit(-1);
+    }
+
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<seconds>(stop - start);
+    std::cout << "Exahype exit status " << status << std::endl;
     std::cout << "Sample took " << duration.count() << std::endl;
-    //std::cout << "run_exahype has solution " << output[0] << " and " << output[1]  << std::endl;
 
-    comm->Barrier();
+
+    std::vector<double> output(4, 0.0);
+    std::ifstream outputsfile(outputsfilename);
+    for (int i = 0; i < output.size(); i++) {
+      outputsfile >> output[i];
+    }
+    outputsfile.close();
+
+    std::cout << "Read outputs from exahype:" << std::endl;
+    for (int i = 0; i < output.size(); i++) {
+      std::cout << output[i] << std::endl;
+    }
+
     double sigma = 1.0;
     double likelihood = 1234;
     if (comm->GetRank() == 0) // Only controller rank does likelihood calculation (muq expects this, so it's fine)
-      likelihood = calculateLikelihood(output,globalComm->GetRank(), level);
+      likelihood = calculateLikelihood(output,globalComm->GetRank(), index->GetValue(0));
     return likelihood;
   };
 
