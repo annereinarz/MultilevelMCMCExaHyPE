@@ -8,8 +8,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include <initialiseMUQ.h>
-
 #include "calculateLikelihood.hh"
 
 namespace pt = boost::property_tree;
@@ -83,13 +81,14 @@ int main(int argc, char** argv){
 
   pt.put("verbosity", 1); // show some output
   //pt.put("MCMC.BurnIn", 100);
-  pt.put("MCMC.BurnIn", 50);
-  pt.put("NumSamples_0", 30);
-  pt.put("NumSamples_1", 12);
+  pt.put("MCMC.BurnIn", 40);
+  pt.put("NumSamples_0", 400);
+  pt.put("NumSamples_1", 300);
+  pt.put("NumSamples_2", 200);
   pt.put("MLMCMC.Scheduling",true);
-  pt.put("MLMCMC.Subsampling_0", 49);
-  //pt.put("MLMCMC.Subsampling_0", 0);
-  pt.put("MLMCMC.Subsampling_1", 0);
+  pt.put("MLMCMC.Subsampling_0", 24);
+  pt.put("MLMCMC.Subsampling_1", 2);
+  pt.put("MLMCMC.Subsampling_2", 0);
 
   auto componentFactory = std::make_shared<MyMIComponentFactory>(pt, comm);
 

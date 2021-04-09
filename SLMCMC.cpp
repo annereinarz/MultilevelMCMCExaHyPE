@@ -8,8 +8,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include <initialiseMUQ.h>
-
 #include "calculateLikelihood.hh"
 
 namespace pt = boost::property_tree;
@@ -25,16 +23,16 @@ using namespace muq::Utilities;
 int main(int argc, char** argv){
   saved_argc = argc;
   saved_argv = argv;
-  muq::initParallelEnvironment(&argc,&argv);
   count = 0;
 
 { // Inverse UQ
+  MPI_Init(&argc, &argv);
   auto comm = std::make_shared<parcer::Communicator>(MPI_COMM_WORLD);
 
 
   pt::ptree pt;
 
-  pt.put("NumSamples", 1000); // number of samples for single level
+  pt.put("NumSamples", 100); // number of samples for single level
   pt.put("verbosity", 1); // show some output
   pt.put("BurnIn", 0);
 
@@ -62,7 +60,6 @@ int main(int argc, char** argv){
   componentFactory->finalize();
 
 }
-  muq::finalize();
   MPI_Finalize();
   return 0;
 }

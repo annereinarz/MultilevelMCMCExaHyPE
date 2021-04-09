@@ -27,8 +27,6 @@ public:
     this->comm = comm;
     this->globalComm = globalComm;
     this->index = index;
-    muq::setCommunicator(comm->GetMPICommunicator());
-    muq::init(saved_argc,saved_argv);
 }
 
   virtual ~MySamplingProblem(){
@@ -56,9 +54,9 @@ public:
     int status;
     std::string inoutsuffix = inputsfilename + " " + outputsfilename;
     if(index->GetValue(0) == 0) {
-      status = system((std::string("cd /hppfs/work/pr83no/ge68wax4/MUQ/ExaHyPE-Tsunami/ApplicationExamples/SWE/SWE_asagi_limited_l0 && ./ExaHyPE-SWE ../SWE_asagi_limited_l0.exahype2 ") + inoutsuffix).c_str());
+      status = system((std::string("cd /hppfs/work/pr83no/ge68wax4/MUQ/ExaHyPE-Tsunami/ApplicationExamples/SWE/SWE_asagi_limited_l0 && ./ExaHyPE-SWE ../SWE_asagi_limited_l0.exahype2 ") + inoutsuffix + std::string(">nul 2>nul")).c_str());
     } else if(index->GetValue(0) == 1) {
-      status = system((std::string("cd /hppfs/work/pr83no/ge68wax4/MUQ/ExaHyPE-Tsunami/ApplicationExamples/SWE/SWE_asagi_limited_l1 && ./ExaHyPE-SWE ../SWE_asagi_limited_l1.exahype2 ") + inoutsuffix).c_str());
+      status = system((std::string("cd /hppfs/work/pr83no/ge68wax4/MUQ/ExaHyPE-Tsunami/ApplicationExamples/SWE/SWE_asagi_limited_l1 && ./ExaHyPE-SWE ../SWE_asagi_limited_l1.exahype2 ") + inoutsuffix + std::string(">nul 2>nul")).c_str());
     } else if(index->GetValue(0) == 2) {
       status = system((std::string("cd /hppfs/work/pr83no/ge68wax4/MUQ/ExaHyPE-Tsunami/ApplicationExamples/SWE/SWE_asagi_limited_l2 && ./ExaHyPE-SWE ../SWE_asagi_limited_l2.exahype2 ") + inoutsuffix).c_str());
     } else {
@@ -69,7 +67,7 @@ public:
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<seconds>(stop - start);
     std::cout << "Exahype exit status " << status << std::endl;
-    std::cout << "Sample took " << duration.count() << std::endl;
+    std::cout << "Sample on level " << index->GetValue(0) << " took " << duration.count() << std::endl;
 
 
     std::vector<double> output(4, 0.0);
@@ -146,7 +144,7 @@ public:
 
   virtual std::shared_ptr<MultiIndex> FinestIndex() override {
     auto index = std::make_shared<MultiIndex>(1);
-    index->SetValue(0, 1);
+    index->SetValue(0, 2);
     return index;
   }
 
