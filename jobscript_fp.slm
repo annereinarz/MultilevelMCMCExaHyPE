@@ -2,8 +2,8 @@
 #SBATCH --account=pr83no
 
 # Job Name and Files (also --job-name)
-#SBATCH -J mlmcmc-parallel
-#SBATCH --partition=test
+#SBATCH -J mlmcmc-3level
+#SBATCH --partition=general
 
 #Output and error (also --output, --error):
 #SBATCH -o ./%x-%t.out
@@ -17,25 +17,20 @@
 #SBATCH --mail-user=reinarz@in.tum.de
 
 # Wall clock limit:
-#SBATCH --time=00:10:00
+#SBATCH --time=07:30:00
 #SBATCH --no-requeue
 
 #SBATCH --exclusive
 #SBATCH --mem=MaxMemPerNode
 
 # set number of nodes
-#SBATCH --nodes=12
-#SBATCH --ntasks=12
+#SBATCH --nodes=18
+#SBATCH --ntasks=64
 # #SBATCH --cpus-per-task=7
 
-export OMP_NUM_THREADS=48 # Ensures we actually get all cores (thanks, SLURM)
+export OMP_NUM_THREADS=12 # Ensures we actually get all cores (thanks, SLURM)
 module load tbb
 module load python/3.6_intel
 module load cmake/3.10
 
-# run the application
-rm parameters_r*.log
-rm likelihood_r*.log
-rm tohoku_output_aderdg/*
-
-srun -n $SLURM_NTASKS  ./FullParallelMLMCMC ../SWE_asagi_limited.exahype2
+srun -n $SLURM_NTASKS  ./FullParallelMLMCMC
