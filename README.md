@@ -2,10 +2,7 @@
 
 This is the MUQ interface for ExaHyPE. To run a MCMC chain you need to install both ExaHyPE and MUQ first.
 
-In ExaHyPE it is important to use the reinarz/muq branch and to switch Peano to the muq branch as well.
-
-  export COMPILER_CFLAGS=-DEXAHYPE_LATE_TAKEOVER
-  export EXAHYPE_LATE_TAKEOVER
+In ExaHyPE you can use the fork: https://github.com/annereinarz/ExaHyPE-Tsunami. This contains in addition to the solver, all required data.
 
 You must then run the toolkit (here it is assumed that ExaHyPE-Engine lies one folder above MultilevelMCMCExaHyPE, if not supply the correct path)
 
@@ -13,7 +10,7 @@ You must then run the toolkit (here it is assumed that ExaHyPE-Engine lies one f
 
 Now move to the SWE_asagi_limited directory and call
 
-  make -j98 link_muq
+  make -j10
 
 to build the muq integration.
 
@@ -33,7 +30,7 @@ The applications can then be compiled using
 
 Running your binary requires the .exahype2 file to be passed:
 
-  mpirun -np 4 ./MLMCMC ../SWE_asagi_limited.exahype2
+  mpirun -np 4 ./MLMCMC
 
 
 # Notes for SuperMUC
@@ -46,23 +43,28 @@ module load tbb/2019
 module load python/3.6_intel
 module load cmake/3.14.4
 
+##ExaHyPE deps:
+ExaHyPE requires easi and its dependency ASAGI, these must be installed before running ExaHyPE.
+
+    git clone https://github.com/uphoffc/ImpalaJIT.git
+    cd ImpalaJIT/ && mkdir build && cd build && cmake -DSHARED_LIB=1 .. && make && make install
+
+    git clone --recursive https://github.com/TUM-I5/ASAGI.git
+    cd ASAGI/ &&  mkdir build && cd build &&  cmake .. && make && make install
+
+    git clone https://github.com/SeisSol/easi.git
+    cd easi && git checkout 18382bf60204c67782057fc371c1e699c9bb31b0
+    mkdir build && cd build && CC=mpicc CXX=mpicxx cmake .. && make
+
+Ensure that all corresponding enviroment variables are set.
+
 ##ExaHyPE:
-git clone git@gitlab.lrz.de:exahype/ExaHyPE-Engine.git
-git checkout reinarz/muq
+git clone https://github.com/annereinarz/ExaHyPE-Tsunami
 
-getting submodules via SSH:
+You must then run the toolkit and compile the application for each level as below:
 
-./updateSubmodules.sh -s
-./updateSubmodules.sh
-
-export COMPILER_CFLAGS=-DEXAHYPE_LATE_TAKEOVER
-export EXAHYPE_LATE_TAKEOVER
-
-In ApplicationExamples/SWE/SWE_asagi_limited.exahype2 set:
-        "architecture": "skx",
-
-../../Toolkit/toolkit.sh SWE_asagi_limited.exahype2
-make -j40 link_muq
+../../Toolkit/toolkit.sh SWE_asagi_limited_l[level].exahype2
+make -j40
 
 #MUQ:
 
